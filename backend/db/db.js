@@ -1,13 +1,11 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 class InitDB {
-
-    connect(uri){
-       return mongoose.connect(uri)
-    }
-    
+  connect(uri) {
+    return mongoose.connect(uri);
+  }
 }
 
-const db = new InitDB(process.env.MONGODB_DB_URI)
+const db = new InitDB();
 
-module.exports = db 
+module.exports = db;
