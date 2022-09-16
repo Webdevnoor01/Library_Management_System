@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, default: mongoose } = require("mongoose");
 
 const studentSchema = Schema(
   {
@@ -20,7 +20,7 @@ const studentSchema = Schema(
     },
     avatar: {
       type: String,
-      required: true,
+      default: null
     },
     depertment: {
       type: String,
@@ -52,8 +52,32 @@ const studentSchema = Schema(
         required: true,
       },
     },
+    libraryId:{
+      type:String,
+      required:true
+    },
+    issuedBookList:[{
+      type:mongoose.Types.ObjectId,
+      ref:"IssuedBooks"
+    }],
+    requestedBookList:[
+      {
+        type:mongoose.Types.ObjectId,
+        ref:"RequestedBooks"
+      }
+    ],
+    fine:[
+      {
+        type:mongoose.Types.ObjectId,
+        ref:"Fine"
+      }
+    ]
   },
   {
     tiemstamps: true,
   }
 );
+
+
+const Students = new model("Students", studentSchema)
+module.exports = Students
