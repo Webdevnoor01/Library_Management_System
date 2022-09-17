@@ -82,6 +82,22 @@ const studentSchema = Schema(
         ref: "Fine",
       },
     ],
+    role: {
+      HOD: {
+        depertment: {
+          type: String,
+        },
+        isHOD: {
+          type: Boolean,
+        },
+      },
+      admission: {
+        type: Boolean,
+      },
+      exam: {
+        type: Boolean,
+      },
+    },
   },
   {
     tiemstamps: true,
