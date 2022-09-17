@@ -22,7 +22,7 @@ const studentSchema = Schema(
       type: String,
       default: null,
     },
-    depertment: {
+    teqachingRole: {
       type: String,
       required: true,
     },
