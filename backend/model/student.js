@@ -1,4 +1,4 @@
-const { Schema, model, default: mongoose } = require("mongoose");
+const { Schema, model, Types } = require("mongoose");
 
 const studentSchema = Schema(
   {
@@ -66,19 +66,19 @@ const studentSchema = Schema(
     },
     issuedBookList: [
       {
-        type: mongoose.Types.ObjectId,
+        type: Types.ObjectId,
         ref: "IssuedBooks",
       },
     ],
     requestedBookList: [
       {
-        type: mongoose.Types.ObjectId,
+        type: Types.ObjectId,
         ref: "RequestedBooks",
       },
     ],
     fine: [
       {
-        type: mongoose.Types.ObjectId,
+        type: Types.ObjectId,
         ref: "Fine",
       },
     ],

@@ -1,6 +1,6 @@
-const { Schema, model, default: mongoose } = require("mongoose");
+const { Schema, model, Types } = require("mongoose");
 
-const studentSchema = Schema(
+const teacherSchema = Schema(
   {
     studentName: {
       type: String,
@@ -66,19 +66,19 @@ const studentSchema = Schema(
     },
     issuedBookList: [
       {
-        type: mongoose.Types.ObjectId,
+        type: Types.ObjectId,
         ref: "IssuedBooks",
       },
     ],
     requestedBookList: [
       {
-        type: mongoose.Types.ObjectId,
+        type: Types.ObjectId,
         ref: "RequestedBooks",
       },
     ],
     fine: [
       {
-        type: mongoose.Types.ObjectId,
+        type: Types.ObjectId,
         ref: "Fine",
       },
     ],
@@ -104,5 +104,5 @@ const studentSchema = Schema(
   }
 );
 
-const Students = new model("Students", studentSchema);
-module.exports = Students;
+const Teacher = new model("Teacher", teacherSchema);
+module.exports = Teacher;
