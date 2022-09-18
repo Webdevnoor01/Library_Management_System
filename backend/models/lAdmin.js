@@ -23,6 +23,6 @@ const adminSchema = Schema({
   },
 });
 
-const libraryAdmin = new model("libraryAdmin", adminSchema);
+const LibraryAdmin = new model("LibraryAdmin", adminSchema);
 
-module.exports = libraryAdmin;
+module.exports = LibraryAdmin;
