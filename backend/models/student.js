@@ -88,5 +88,5 @@ const studentSchema = Schema(
   }
 );
 
-const Students = new model("Students", studentSchema);
-module.exports = Students;
+const Student = new model("Student", studentSchema);
+module.exports = Student;
