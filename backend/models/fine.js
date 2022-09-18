@@ -11,10 +11,12 @@ const fineSchema = Schema(
     },
     user: {
       student: {
-        type: String,
+        type: Types.ObjectId,
+        ref: "Student",
       },
       teachaer: {
-        type: String,
+        type: Types.ObjectId,
+        ref: "Teacher",
       },
     },
   },
