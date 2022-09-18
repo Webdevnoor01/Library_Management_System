@@ -28,5 +28,5 @@ const issuedBookSchema = Schema(
   }
 );
 
-const IssuedBook = new Schema("IssuedBook", issuedBookSchema);
+const IssuedBook = new model("IssuedBook", issuedBookSchema);
 module.exports = IssuedBook;
