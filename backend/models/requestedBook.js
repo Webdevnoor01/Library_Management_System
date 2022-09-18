@@ -5,7 +5,7 @@ const requestedBookSchema = Schema({
     type: Types.ObjectId,
     references: [
       { type: Types.ObjectId, ref: "Teacher" },
-      { type: Types.ObjectId, ref: "Students" },
+      { type: Types.ObjectId, ref: "Student" },
     ],
     required: true,
   },
