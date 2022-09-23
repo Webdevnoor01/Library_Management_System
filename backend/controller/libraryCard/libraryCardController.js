@@ -21,22 +21,46 @@ class LibraryCard {
 
    async findCard(_req, res, _next){
         const libraryCards = await libraryCardSearvice.findCard()
-        if(libraryCards){
+        try {
+            if(libraryCards){
 
-            res.status(200).json({
-                libraryCards
-            })
-        }else{
+                res.status(200).json({
+                    libraryCards
+                })
+            }
+        } catch (e) {
+            console.log(e)
             res.status(400).json({
                 errors:{
                     libraryCard:{
                         msg:"There is no library card"
                     }
                 }
-            })
+            }) 
         }
 
+    }
 
+    async findCardByLid(req, res, _next){
+        const {libraryId } = req.params 
+        try {
+            const libraryCard = await libraryCardSearvice.findCardById(libraryId)
+            if(libraryCard){
+                res.status(200).json({
+                    message:"Success",
+                    libraryCard
+                })
+            }
+            
+        } catch (e) {
+            res.status(400).json({
+                errors:{
+                    libraryCard:{
+                        msg:"Library card not found for " +libraryId
+                    }
+                }
+            })
+        }
     }
 }
 

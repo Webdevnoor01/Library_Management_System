@@ -11,6 +11,7 @@ libraryCardController.create
 
 )
 router.get("/find", libraryCardController.findCard)
+router.get("/find/:libraryId",libraryCardController.findCardByLid )
 
 
 module.exports = router;
