@@ -24,9 +24,8 @@ class LibraryCardSearvice {
 
   async findCardById(libraryId) {
     const libraryCard = await LibraryCard.findOne({
-      libraryId: libraryId,
+      libraryId,
     });
-    console.log("libraryCard ", libraryCard);
     return libraryCard;
   }
 
