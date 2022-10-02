@@ -33,7 +33,7 @@ class UserService {
         const user = await model.findOne({ key: value });
 
         if (!user) {
-          if(libraryId === libraryCard.libraryId){
+          if (libraryId === libraryCard.libraryId) {
             return false
           }
         } else {
