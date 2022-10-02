@@ -12,38 +12,23 @@ class StudentValidator {
         .isAlpha("en-US", { ignore: " -" })
         .withMessage("Name must not contain anything other than alphabet"),
 
-      function (req, res, next) {
-        body("email")
+      
+        check("email")
           .isEmail()
           .withMessage("Please eneter valid email")
           .custom(async (value) => {
             try {
               const email = await Student.findOne({ email: value });
               if (email) {
-                res.status(400).json({
-                  error: {
-                    message: "Email already in use",
-                  },
-                });
+                throw new Error( "Email already in use");
+
                 //   throw new Error("Email already in use");
               }
             } catch (e) {
-              res.status(400).json({
-                error: {
-                  message: e.message,
-                },
-              });
+              throw new Error( e.message);
             }
-          });
-        var errorValidation = validationResult(req);
-        if (errorValidation) {
-          return res.status(500).json({
-            title: "an error occured",
-            error: "plese type valid email",
-          });
-        }
-        next();
-      },
+            return true
+          }),
 
       check("phone")
         .isLength({ min: 10, max: 12 })
@@ -52,13 +37,14 @@ class StudentValidator {
         .withMessage("Your mobile number must be an Indian number")
         .custom(async (value) => {
           try {
-            const phone = await Student.findOne({ phone: value });
+            const phone = await Student.findOne({ "phone": value });
             if (phone) {
               throw new Error("Phone already in use");
             }
           } catch (e) {
             throw new Error(e.message);
           }
+          return true
         }),
 
       check("password")
