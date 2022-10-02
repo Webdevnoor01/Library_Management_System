@@ -33,15 +33,17 @@ class UserService {
         const user = await model.findOne({ key: value });
 
         if (!user) {
+          if(libraryId === libraryCard.libraryId){
+            return false
+          }
+        } else {
           if (user.libraryId == libraryCard.libraryId) {
             if (user.studentName == libraryCard.userName) {
-              return true;
+              return false;
             }
           } else {
             throw new Error("Please type valid library id");
           }
-        } else {
-          throw new Error("Please try again ");
         }
       } else {
         throw new Error("Please type valid library id");
