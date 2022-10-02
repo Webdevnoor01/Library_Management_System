@@ -53,7 +53,7 @@ class AuthController {
         });
       } else {
         res.status(400).json({
-          message: "Please try again",
+          message: "User already exists",
         });
       }
     } catch (error) {
