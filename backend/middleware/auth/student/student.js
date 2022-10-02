@@ -12,23 +12,22 @@ class StudentValidator {
         .isAlpha("en-US", { ignore: " -" })
         .withMessage("Name must not contain anything other than alphabet"),
 
-      
-        check("email")
-          .isEmail()
-          .withMessage("Please eneter valid email")
-          .custom(async (value) => {
-            try {
-              const email = await Student.findOne({ email: value });
-              if (email) {
-                throw new Error( "Email already in use");
+      check("email")
+        .isEmail()
+        .withMessage("Please eneter valid email")
+        .custom(async (value) => {
+          try {
+            const email = await Student.findOne({ email: value });
+            if (email) {
+              throw new Error("Email already in use");
 
-                //   throw new Error("Email already in use");
-              }
-            } catch (e) {
-              throw new Error( e.message);
+              //   throw new Error("Email already in use");
             }
-            return true
-          }),
+          } catch (e) {
+            throw new Error(e.message);
+          }
+          return true;
+        }),
 
       check("phone")
         .isLength({ min: 10, max: 12 })
@@ -37,14 +36,14 @@ class StudentValidator {
         .withMessage("Your mobile number must be an Indian number")
         .custom(async (value) => {
           try {
-            const phone = await Student.findOne({ "phone": value });
+            const phone = await Student.findOne({ phone: value });
             if (phone) {
               throw new Error("Phone already in use");
             }
           } catch (e) {
             throw new Error(e.message);
           }
-          return true
+          return true;
         }),
 
       check("password")
@@ -76,6 +75,12 @@ class StudentValidator {
         .withMessage("please type valid year")
         .isNumeric()
         .withMessage("current_year must be a number"),
+
+      check("userRole")
+        .isString()
+        .withMessage("User role must be an string")
+        .isLength({ min: 5, max: 50 })
+        .withMessage("minimum 5 character required"),
 
       check("address[village]")
         .isString()

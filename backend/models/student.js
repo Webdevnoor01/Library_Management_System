@@ -38,6 +38,10 @@ const studentSchema = Schema(
       type: Number,
       required: true,
     },
+    userRole: {
+      type: String,
+      required: true,
+    },
     address: {
       village: {
         type: String,
