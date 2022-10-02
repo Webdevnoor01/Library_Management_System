@@ -10,13 +10,33 @@ class UserService {
     }
   }
 
-  async findUserByProperty(model, key, value, libraryId) {
+  async findUserByProperty(model, query) {
+    // const query = { key: value };
+    console.log(query);
+    try {
+      if (query._id) {
+        const user = await model.findById(value);
+
+        if (!user) return false;
+        return user;
+      }
+      const user = await model.findOne(query);
+
+      if (!user) return false;
+
+      return user;
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  }
+
+  async findUserByPropertyAndRegister(model, query, libraryId) {
     try {
       // First check that the library card is valid or not
 
       const libraryCard = await libraryCardSearvice.findCardById(libraryId);
       if (libraryCard) {
-        if (key === "_id") {
+        if (query._id) {
           const user = await model.findById(value);
 
           if (!user) return false;
@@ -30,11 +50,11 @@ class UserService {
           }
         }
 
-        const user = await model.findOne({ key: value });
+        const user = await model.findOne(query);
 
         if (!user) {
           if (libraryId === libraryCard.libraryId) {
-            return false
+            return false;
           }
         } else {
           if (user.libraryId == libraryCard.libraryId) {
@@ -49,8 +69,7 @@ class UserService {
         throw new Error("Please type valid library id");
       }
     } catch (e) {
-      console.log(e);
-      return e;
+      throw new Error(e.message);
     }
   }
 }
