@@ -2,7 +2,7 @@ const { Schema, model, Types } = require("mongoose");
 
 const teacherSchema = Schema(
   {
-    studentName: {
+    teacherName: {
       type: String,
       required: true,
     },
