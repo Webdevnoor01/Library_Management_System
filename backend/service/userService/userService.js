@@ -11,11 +11,9 @@ class UserService {
   }
 
   async findUserByProperty(model, query) {
-    // const query = { key: value };
-    console.log(query);
     try {
       if (query._id) {
-        const user = await model.findById(value);
+        const user = await model.findById(query.value);
 
         if (!user) return false;
         return user;
@@ -37,7 +35,7 @@ class UserService {
       const libraryCard = await libraryCardSearvice.findCardById(libraryId);
       if (libraryCard) {
         if (query._id) {
-          const user = await model.findById(value);
+          const user = await model.findById(query.value);
 
           if (!user) return false;
           if (
