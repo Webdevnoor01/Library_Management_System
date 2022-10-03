@@ -1,6 +1,9 @@
 const bcrypt = require("bcrypt");
 const userService = require("../../../service/userService/userService");
 const Student = require("../../../models/student");
+const tokenService = require("../../../service/token/tokenService");
+const StudentRefreshModel = require("../../../models/tokens/studentRefreshToken")
+const UserDto = require("../../../userDTO/userDto")
 
 class AuthController {
   async register(req, res, _next) {
@@ -93,8 +96,27 @@ class AuthController {
       }
       // TODO
       // create token (access token and refresh token) and send token
+      const tokenPayload = {
+        _id: user._id,
+        activated:false
+
+      }
+
+      const {accessToken, refreshToekn} = await tokenService.generateTokens(tokenPayload)
+
+      res.cookie("accessToken", accessToken,{
+        maxAge: 1000 * 60 * 60 * 24 * 30,
+        httpOnly: true,
+      })
+
+      res.cookie("refreshToken", refreshToekn,{
+        maxAge: 1000 * 60 * 60 * 24 * 30,
+        httpOnly: true,
+      })
+
+      const userDto  = new UserDto(user)
       res.status(200).json({
-        message: "Login successfully",
+        user:userDto, studentAuth:true
       });
     } catch (e) {
       console.log(e);
