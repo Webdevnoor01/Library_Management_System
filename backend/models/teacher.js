@@ -11,7 +11,7 @@ const teacherSchema = Schema(
       required: true,
     },
     phone: {
-      type: String,
+      type: Number,
       required: true,
     },
     password: {
@@ -22,20 +22,12 @@ const teacherSchema = Schema(
       type: String,
       default: null,
     },
-    teqachingRole: {
-      type: String,
-      required: true,
-    },
-    semester: {
-      type: String,
-      required: true,
-    },
-    admission_date: {
-      type: String,
-      required: true,
-    },
     current_year: {
       type: Number,
+      required: true,
+    },
+    userRole: {
+      type: String,
       required: true,
     },
     address: {
@@ -82,20 +74,28 @@ const teacherSchema = Schema(
         ref: "Fine",
       },
     ],
-    role: {
+    roles: {
       HOD: {
         depertment: {
           type: String,
+          required:false,
+          default:"No"
         },
         isHOD: {
           type: Boolean,
+          required:false,
+          default:false
         },
       },
-      admission: {
+      admissionCell: {
         type: Boolean,
+        required:false,
+        default:false
       },
-      exam: {
+      examCell: {
         type: Boolean,
+        required:false,
+        default:false
       },
     },
   },
