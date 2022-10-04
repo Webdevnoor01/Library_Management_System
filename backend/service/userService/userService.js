@@ -14,11 +14,11 @@ class UserService {
     try {
       if (query._id) {
         const user = await model.findById(query.value);
-
         if (!user) return false;
         return user;
       }
       const user = await model.findOne(query);
+      console.log(user)
 
       if (!user) return false;
 
@@ -33,6 +33,8 @@ class UserService {
       // First check that the library card is valid or not
 
       const libraryCard = await libraryCardSearvice.findCardById(libraryId);
+    console.log(libraryCard)
+
       if (libraryCard) {
         if (query._id) {
           const user = await model.findById(query.value);
@@ -49,15 +51,25 @@ class UserService {
         }
 
         const user = await model.findOne(query);
-
+        console.log(user)
         if (!user) {
-          if (libraryId === libraryCard.libraryId) {
+          if (libraryId === user.libraryId) {
             return false;
           }
         } else {
+
           if (user.libraryId == libraryCard.libraryId) {
-            if (user.studentName == libraryCard.userName) {
-              return false;
+            if(user.studentName){
+
+              if (user.studentName == libraryCard.userName) {
+                return false;
+              }
+            }
+            if(user.teacherName){
+
+              if (user.teacherName == libraryCard.userName) {
+                return false;
+              }
             }
           } else {
             throw new Error("Please type valid library id");
