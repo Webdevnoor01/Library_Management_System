@@ -67,7 +67,7 @@ class AuthController {
     }
   }
 
-  async login(req, res, next) {
+  async login(req, res, _next) {
     const { email, password, role } = req.body;
 
     try {
@@ -102,14 +102,17 @@ class AuthController {
 
       }
 
-      const {accessToken, refreshToekn} = await tokenService.generateTokens(tokenPayload)
-
+      const {accessToken, refreshToken} = await tokenService.generateTokens(tokenPayload)
+      await tokenService.storeRefreshToken(StudentRefreshModel,{
+        token:refreshToken,
+        userId:user._id
+      })
       res.cookie("accessToken", accessToken,{
         maxAge: 1000 * 60 * 60 * 24 * 30,
         httpOnly: true,
       })
 
-      res.cookie("refreshToken", refreshToekn,{
+      res.cookie("refreshToken", refreshToken,{
         maxAge: 1000 * 60 * 60 * 24 * 30,
         httpOnly: true,
       })
@@ -128,6 +131,24 @@ class AuthController {
         },
       });
     }
+  }
+
+
+  async logout(req, res, _next){
+    const {refreshToken} = req.cookies
+    try {
+      
+      const deleteRefreshToken = await tokenService.removeRefreshToken(StudentRefreshModel, refreshToken) 
+      res.clearCookie("accessToken")
+      res.clearCookie("refreshToken")
+
+      res.status(200).json({
+        user:null, auth:false
+      })
+    } catch (error) {
+      console.log(error)
+    }
+    
   }
 }
 
