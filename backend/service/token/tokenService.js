@@ -10,21 +10,24 @@ class TokenService {
     async generateTokens(payload) {
         try {
             const accessToken = await jwt.sign(payload, accessTokenSecret, {
-                expiresIn: "1m"
+                expiresIn:"30d"
             })
 
-            const refreshToekn = await jwt.sign(payload, refreshTokenSecret, {
-                expiresIn:"1y"
+            const refreshToken = await jwt.sign(payload, refreshTokenSecret, {
+                expiresIn: '365d'
             })
-            return { accessToken, refreshToekn }
+            return { accessToken, refreshToken }
         } catch (e) {
             throw new Error(e.message)
         }
     }
 
-    async storeRefreshToken(model, token) {
+    async storeRefreshToken(model, payload) {
+
         try {
-            const refreshToken = await model.create(token)
+
+            const refreshToken = await model.create(payload)
+
         } catch (e) {
             throw new Error(e.message)
         }
@@ -39,17 +42,19 @@ class TokenService {
     }
 
     async findRefreshToken(model, userId, refreshToken) {
+        const quary = { token: refreshToken, userId: userId }
+        console.log("query " + JSON.parse(JSON.stringify(quary)))
 
-        return await model.findOne({ userId: userId, token: refreshToken })
+        return await model.findOne({ token: refreshToken, userId: userId })
 
     }
 
     async updateRefreshToken(model, userId, refreshToken) {
-        return await model.updateOne({userId:userId},{token:refreshToken})
+        return await model.updateOne({ userId: userId }, { token: refreshToken })
     }
 
-    async removeRefreshToken(model,refreshToken){
-        return await model.deleteOne({token:refreshToken})
+    async removeRefreshToken(model, refreshToken) {
+        return await model.deleteOne({ token: refreshToken })
     }
 
 
