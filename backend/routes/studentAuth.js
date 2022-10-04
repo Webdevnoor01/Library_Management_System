@@ -1,6 +1,6 @@
 const router = require("express").Router();
-const studentValidator = require("../middleware/auth/student/student");
-const studentController = require("../controller/auth/student/sAuthController");
+const studentValidator = require("../middleware/auth/teacherStudent/teacherStudent");
+const studentController = require("../controller/auth/teacherStudent/tsAuthController");
 const authenticateMiddleware = require("../middleware/authenticate/authenticate")
 
 router.post(
