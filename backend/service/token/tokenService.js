@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken")
-const StudentRefreshModel = require("../../models/tokens/studentRefreshToken")
 const accessTokenSecret = process.env.JWT_ACCES_TOKEN_SECRET
 const refreshTokenSecret = process.env.JWT_REFRESH_TOKEN_SECRET
 
