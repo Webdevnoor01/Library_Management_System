@@ -4,6 +4,10 @@ class LibraryCard {
   async create(req, res, _next) {
     const { userName, depertment, issueDate, libraryId, bookLimit } = req.body;
     try {
+      const isLibraryCard = await libraryCardSearvice.findCardById(libraryId)
+      if(isLibraryCard){
+        return res.status(400).json({ messsage: "Please try atain" })
+      }
       const libraryCard = await libraryCardSearvice.createCard({
         userName,
         depertment,
@@ -17,7 +21,7 @@ class LibraryCard {
           .status(200)
           .json({ messsage: "Library Card created successfully", libraryCard });
       } else {
-        res.status(400).json({ messsage: "Library Card already created" });
+        res.status(400).json({ messsage: "Please try atain" });
       }
     } catch (error) {
       res.status(500).json({
