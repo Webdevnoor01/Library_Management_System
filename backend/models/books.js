@@ -17,12 +17,12 @@ const bookSchema = Schema(
       },
     ],
     bookQuantity: {
-      type: String,
+      type: Number,
       required: true,
     },
     bookImage: {
       type: String,
-      required: true,
+      required: false,
     },
     isbn: {
       type: String,
@@ -32,7 +32,7 @@ const bookSchema = Schema(
       type: Number,
       required: true,
     },
-    catogory: {
+    category: {
       type: String,
       required: true,
     },
