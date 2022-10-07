@@ -92,13 +92,23 @@ class BookController {
       };
       const book = await bookService.findBookByProperty(searchQuary);
 
-      if (!book) throw createError("No book found");
+      if (book.error) {
+        throw createError(book.message)
+      }
 
       res.status(200).json({
         message: "Ok",
         book,
       });
-    } catch (e) {}
+    } catch (e) {
+      res.status(400).json({
+        errors:{
+          book:{
+            msg:e.message
+          }
+        }
+      })
+    }
   }
 }
 
