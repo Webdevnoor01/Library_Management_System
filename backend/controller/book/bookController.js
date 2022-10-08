@@ -93,7 +93,7 @@ class BookController {
       const book = await bookService.findBookByProperty(searchQuary);
 
       if (book.error) {
-        throw createError(book.message)
+        throw createError(book.message);
       }
 
       res.status(200).json({
@@ -102,12 +102,45 @@ class BookController {
       });
     } catch (e) {
       res.status(400).json({
-        errors:{
-          book:{
-            msg:e.message
-          }
-        }
-      })
+        errors: {
+          book: {
+            msg: e.message,
+          },
+        },
+      });
+    }
+  }
+
+  async updateBook(req, res) {
+    const { id } = req.params;
+    const body = req.body;
+
+    if (req.files) {
+      console.log("Ok");
+    }
+    try {
+      let payload = body;
+      if (req.files) {
+        payload = {
+          bookImage: req.files[0].path,
+        };
+      }
+      const book = await bookService.updateBook(id, payload);
+      if (!book) {
+        throw createError("Something went wrong");
+      }
+
+      res.status(200).json({
+        message: "Ok",
+      });
+    } catch (e) {
+      res.status(400).json({
+        errors: {
+          book: {
+            msg: e.message,
+          },
+        },
+      });
     }
   }
 }
