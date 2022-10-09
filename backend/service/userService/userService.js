@@ -1,3 +1,4 @@
+const createError = require("http-errors");
 const libraryCardSearvice = require("../libraryCardService/index");
 
 class UserService {
@@ -18,7 +19,7 @@ class UserService {
         return user;
       }
       const user = await model.findOne(query);
-      console.log(user)
+      console.log(user);
 
       if (!user) return false;
 
@@ -33,7 +34,7 @@ class UserService {
       // First check that the library card is valid or not
 
       const libraryCard = await libraryCardSearvice.findCardById(libraryId);
-    console.log(libraryCard)
+      console.log(libraryCard);
 
       if (libraryCard) {
         if (query._id) {
@@ -51,22 +52,19 @@ class UserService {
         }
 
         const user = await model.findOne(query);
-        console.log(user)
+        console.log(user);
         if (!user) {
           if (libraryId === user.libraryId) {
             return false;
           }
         } else {
-
           if (user.libraryId == libraryCard.libraryId) {
-            if(user.studentName){
-
+            if (user.studentName) {
               if (user.studentName == libraryCard.userName) {
                 return false;
               }
             }
-            if(user.teacherName){
-
+            if (user.teacherName) {
               if (user.teacherName == libraryCard.userName) {
                 return false;
               }
@@ -80,6 +78,35 @@ class UserService {
       }
     } catch (e) {
       throw new Error(e.message);
+    }
+  }
+
+  async updateUserRef(model, query, payload) {
+    try {
+      let user;
+      if (query._id) {
+        user = await model.findByIdAndUpdate(
+          { _id: query._id },
+          {
+            $push: {
+              requestedBookList: payload.requestedBookId,
+            },
+          }
+        );
+        console.log(user);
+      } else {
+        user = await model.findOneAndUpdate(query, {
+          $push: {
+            requestedBookList: query.requestedBookId,
+          },
+        });
+      }
+
+      if (!user) return false;
+      return user;
+    } catch (e) {
+      console.log(e);
+      throw createError(e.message);
     }
   }
 }
