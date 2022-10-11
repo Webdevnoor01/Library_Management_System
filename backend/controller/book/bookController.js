@@ -1,5 +1,7 @@
+const fs = require("fs")
 const bookService = require("../../service/bookService/bookService");
 const createError = require("http-errors");
+
 
 class BookController {
   async create(req, res) {
@@ -15,6 +17,7 @@ class BookController {
     } = req.body;
 
     try {
+      console.log(req.files)
       const bookPayload = {
         bookName,
         authorName,
@@ -26,7 +29,7 @@ class BookController {
         category,
       };
 
-      const isBook = await bookService.findBookByIsbn(isbn);
+      const isBook = await bookService.findBookByProperty({isbn:isbn});
       let book;
       if (!isBook) {
         book = await bookService.createNewBook(bookPayload);
@@ -38,6 +41,15 @@ class BookController {
           book,
         });
       } else {
+        if(req.files){
+          const path = req.files[0].path
+          fs.unlink(path,(err) =>{
+            if(err){
+              throw createError("something went went wrong")
+            }
+          })
+
+        }
         res.status(400).json({
           errors: {
             book: {
@@ -47,6 +59,7 @@ class BookController {
         });
       }
     } catch (e) {
+      console.log(e)
       res.status(500).json({
         errors: {
           book: {
