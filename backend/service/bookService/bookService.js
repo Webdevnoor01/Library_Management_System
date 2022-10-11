@@ -74,6 +74,7 @@ class BookService {
           (book.length <= 0 && sendBookError("Please check author name.")) ||
           book;
       }
+      console.log( "this is book " + book)
       return book;
     } catch (e) {
       console.log(e.message);
