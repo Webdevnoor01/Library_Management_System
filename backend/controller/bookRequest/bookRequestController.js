@@ -4,6 +4,7 @@ const userService = require("../../service/userService/userService");
 const Student = require("../../models/student");
 
 class BookRequest {
+
   async newBookRequest(req, res) {
     const { bookId, userId } = req.query;
     try {
@@ -15,6 +16,7 @@ class BookRequest {
       const isRequestedBook = await requestBookService.findRequestedBook(
         payload
       );
+
       if (isRequestedBook)
         throw createError("You already send request for this book");
 
@@ -25,7 +27,6 @@ class BookRequest {
           { _id: userId },
           { requestedBookId: requsetedBook._id }
         );
-        console.log("controller", user);
 
         if (!user) {
           throw createError("something went wrong");
@@ -38,6 +39,7 @@ class BookRequest {
         requsetedBook,
       });
     } catch (e) {
+      console.log(e)
       res.status(500).json({
         errors: {
           requestedBook: {
@@ -45,6 +47,29 @@ class BookRequest {
           },
         },
       });
+    }
+  }
+
+  async findRequestedBook(req, res) {
+    const {} = req.body 
+    try {
+      const requestedBook = await requestBookService.findAllRequestedBook()
+      if(!requestedBook) throw createError("No books found")
+
+      res.status(200).json({
+        message:"Ok",
+        requestedBook
+      })
+    } catch (e) {
+      console.log(e);
+      
+      res.status(500).json({
+        errors:{
+          requestedBook:{
+            msg:e.message
+          }
+        }
+      })
     }
   }
 }
