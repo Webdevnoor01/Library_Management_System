@@ -12,7 +12,17 @@ class RequestBookService {
     }
   }
 
-  async findRequestedBook(payload) {
+  async findAllRequestedBook() {
+    try {
+      const requestedBook = await RequestBook.find({});
+      if (!requestedBook.length >0) return false;
+      return requestedBook;
+    } catch (e) {
+      throw createError(e.message);
+    }
+  }
+
+  async findRequestedBookByProperty(payload) {
     try {
       const requestedBook = await RequestBook.findOne(payload);
       if (!requestedBook) return false;
