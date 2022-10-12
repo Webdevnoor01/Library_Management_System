@@ -3,5 +3,6 @@ const bookRequestController = require("../controller/bookRequest/bookRequestCont
 const router = require("express").Router();
 
 router.post("/", bookRequestController.newBookRequest);
+router.get("/find", bookRequestController.findRequestedBook)
 
 module.exports = router;
