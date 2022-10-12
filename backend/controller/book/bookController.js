@@ -29,9 +29,10 @@ class BookController {
         category,
       };
 
-      const isBook = await bookService.findBookByProperty({isbn:isbn});
+      const isBook = await bookService.findBookByProperty({ isbn: isbn });
+      console.log("isBook: ", isBook)
       let book;
-      if (!isBook) {
+      if (isBook.error) {
         book = await bookService.createNewBook(bookPayload);
         if (!book) {
           return createError("something went wrong");
@@ -41,10 +42,10 @@ class BookController {
           book,
         });
       } else {
-        if(req.files){
+        if (req.files) {
           const path = req.files[0].path
-          fs.unlink(path,(err) =>{
-            if(err){
+          fs.unlink(path, (err) => {
+            if (err) {
               throw createError("something went went wrong")
             }
           })
