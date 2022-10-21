@@ -2,6 +2,7 @@ const createError = require("http-errors");
 const requestBookService = require("../../service/requestBookService/requestBookService");
 const userService = require("../../service/userService/userService");
 const Student = require("../../models/student");
+const findModel  = require("../../util/findModel")
 
 class BookRequest {
 
@@ -13,7 +14,7 @@ class BookRequest {
         userId,
       };
 
-      const isRequestedBook = await requestBookService.findRequestedBook(
+      const isRequestedBook = await requestBookService.findRequestedBookByProperty(
         payload
       );
 
@@ -28,9 +29,7 @@ class BookRequest {
           { requestedBookId: requsetedBook._id }
         );
 
-        if (!user) {
-          throw createError("something went wrong");
-        }
+       
       }
 
       if (!requsetedBook) throw createError("something went wrong.");
@@ -72,6 +71,31 @@ class BookRequest {
       })
     }
   }
+
+  async findUserRequestedBook(req, res) {
+    const {userId}  = req.params
+    try {
+      const requestedBooks = await userService.findRequestedBook(findModel(req.userRole),userId)
+      if(requestedBooks.error){
+        throw createError(requestedBooks.message)
+      }
+
+      res.status(200).json({
+        message:"Ok",
+        requestedBooks:requestedBooks.data
+      })
+    } catch (e) {
+      res.status(500).json({
+        errors:{
+          requestedBooks:{
+            msg:e.message
+          }
+        }
+      })
+    }
+  }
+
+
 }
 
 module.exports = new BookRequest();
