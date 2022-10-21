@@ -5,6 +5,7 @@ class RequestBookService {
   async newBookRequest(payload) {
     try {
       const bookRequest = await RequestBook.create(payload);
+      console.log( "New book Reauest", bookRequest)
       if (!bookRequest) return false;
       return bookRequest;
     } catch (e) {
@@ -31,6 +32,7 @@ class RequestBookService {
       throw createError(e.message);
     }
   }
+
 }
 
 module.exports = new RequestBookService();
