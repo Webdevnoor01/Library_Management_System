@@ -93,7 +93,6 @@ class UserService {
             },
           }
         );
-        console.log(user);
       } else {
         user = await model.findOneAndUpdate(query, {
           $push: {
@@ -107,6 +106,25 @@ class UserService {
     } catch (e) {
       console.log(e);
       throw createError(e.message);
+    }
+  }
+
+  async findRequestedBook(model, userId){
+    try {
+      const requestedBooks = await model.findById(userId, "requestedBookList" ).populate("requestedBookList")
+      if(!requestedBooks){
+        return {
+          error:true,
+          message:"You don't have any requested book"
+        }
+      }
+      return {
+        error:false,
+        data:requestedBooks.requestedBookList
+      }
+    } catch (e) {
+      console.log(e)
+      throw createError(e.message)
     }
   }
 }
