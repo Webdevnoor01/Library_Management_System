@@ -120,10 +120,10 @@ class AuthController {
           },
         });
       }
-      // TODO
-      // create token (access token and refresh token) and send token
+      
       const tokenPayload = {
         _id: user._id,
+        userRole:user.userRole,
         activated:false
 
       }
