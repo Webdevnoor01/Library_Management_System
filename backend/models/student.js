@@ -77,7 +77,7 @@ const studentSchema = Schema(
     requestedBookList: [
       {
         type: Types.ObjectId,
-        ref: "RequestedBooks",
+        ref: "RequestedBook",
       },
     ],
     fine: [
