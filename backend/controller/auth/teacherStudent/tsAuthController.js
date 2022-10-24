@@ -2,13 +2,12 @@ const bcrypt = require("bcrypt");
 const userService = require("../../../service/userService/userService");
 const Student = require("../../../models/student");
 const tokenService = require("../../../service/token/tokenService");
-const RefreshToken = require("../../../models/tokens/refreshToken")
-const UserDto = require("../../../userDTO/userDto")
+const RefreshToken = require("../../../models/tokens/refreshToken");
+const UserDto = require("../../../userDTO/userDto");
 
-const findModel = require("../../../util/findModel")
+const findModel = require("../../../util/findModel");
 
 class AuthController {
-  
   async register(req, res, _next) {
     const {
       studentName,
@@ -24,7 +23,7 @@ class AuthController {
       userRole,
       address,
       libraryId,
-      role
+      role,
     } = req.body;
 
     try {
@@ -38,8 +37,7 @@ class AuthController {
         // Hash the password
         const hasPassword = await bcrypt.hash(password, 10);
         let payload;
-        if(userRole === "Student" || userRole === "student"){
-
+        if (userRole === "Student" || userRole === "student") {
           payload = {
             studentName,
             teacherName,
@@ -54,11 +52,11 @@ class AuthController {
             userRole,
             address,
             libraryId,
-            role: role || null
+            role: role || null,
           };
         }
 
-        if(userRole === "Teacher" || userRole === "teacher"){
+        if (userRole === "Teacher" || userRole === "teacher") {
           payload = {
             teacherName,
             email,
@@ -69,7 +67,7 @@ class AuthController {
             userRole,
             address,
             libraryId,
-            role
+            role,
           };
         }
 
@@ -78,16 +76,17 @@ class AuthController {
         });
 
         res.status(200).json({
-          message: "New user created successfully"
+          message: "New user created successfully",
         });
       } else {
         res.status(400).json({
-          message: "Please try again",
+          message: "User already exist",
         });
       }
     } catch (error) {
+      console.log(error);
       res.status(400).json({
-        message: "Please try again",
+        message: error.message,
       });
     }
   }
@@ -96,7 +95,7 @@ class AuthController {
     const { email, password, role } = req.body;
 
     try {
-      const model = findModel(role)
+      const model = findModel(role);
       const user = await userService.findUserByProperty(model, {
         email: email,
       });
@@ -120,34 +119,35 @@ class AuthController {
           },
         });
       }
-      
+
       const tokenPayload = {
         _id: user._id,
-        userRole:user.userRole,
-        activated:false
+        userRole: user.userRole,
+        activated: false,
+      };
 
-      }
-
-      const {accessToken, refreshToken} = await tokenService.generateTokens(tokenPayload)
-      await tokenService.storeRefreshToken(RefreshToken,{
-        token:refreshToken,
-        userId:user._id
-      })
-
-      res.cookie("accessToken", accessToken,{
-        maxAge: 1000 * 60 * 60 * 24 * 30,
-        httpOnly: true,
-      })
-      res.cookie("refreshToken", refreshToken,{
-        maxAge: 1000 * 60 * 60 * 24 * 30,
-        httpOnly: true,
-      })
-
-      const userDto  = new UserDto(user)
-      res.status(200).json({
-        user:userDto, studentAuth:true
+      const { accessToken, refreshToken } = await tokenService.generateTokens(
+        tokenPayload
+      );
+      await tokenService.storeRefreshToken(RefreshToken, {
+        token: refreshToken,
+        userId: user._id,
       });
 
+      res.cookie("accessToken", accessToken, {
+        maxAge: 1000 * 60 * 60 * 24 * 30,
+        httpOnly: true,
+      });
+      res.cookie("refreshToken", refreshToken, {
+        maxAge: 1000 * 60 * 60 * 24 * 30,
+        httpOnly: true,
+      });
+
+      const userDto = new UserDto(user);
+      res.status(200).json({
+        user: userDto,
+        studentAuth: true,
+      });
     } catch (e) {
       console.log(e);
       res.status(500).json({
@@ -160,24 +160,24 @@ class AuthController {
     }
   }
 
-
-  async logout(req, res, _next){
-    const {refreshToken} = req.cookies
+  async logout(req, res, _next) {
+    const { refreshToken } = req.cookies;
     try {
-      
-      const deleteRefreshToken = await tokenService.removeRefreshToken(RefreshToken, refreshToken) 
-      res.clearCookie("accessToken")
-      res.clearCookie("refreshToken")
+      const deleteRefreshToken = await tokenService.removeRefreshToken(
+        RefreshToken,
+        refreshToken
+      );
+      res.clearCookie("accessToken");
+      res.clearCookie("refreshToken");
 
       res.status(200).json({
-        user:null, auth:false
-      })
+        user: null,
+        auth: false,
+      });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-    
   }
-
 }
 
 module.exports = new AuthController();
