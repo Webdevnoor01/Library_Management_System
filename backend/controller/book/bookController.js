@@ -1,7 +1,6 @@
-const fs = require("fs")
+const fs = require("fs");
 const bookService = require("../../service/bookService/bookService");
 const createError = require("http-errors");
-
 
 class BookController {
   async create(req, res) {
@@ -17,7 +16,7 @@ class BookController {
     } = req.body;
 
     try {
-      console.log(req.files)
+      console.log(req.files);
       const bookPayload = {
         bookName,
         authorName,
@@ -30,7 +29,7 @@ class BookController {
       };
 
       const isBook = await bookService.findBookByProperty({ isbn: isbn });
-      console.log("isBook: ", isBook)
+      console.log("isBook: ", isBook);
       let book;
       if (isBook.error) {
         book = await bookService.createNewBook(bookPayload);
@@ -43,13 +42,12 @@ class BookController {
         });
       } else {
         if (req.files) {
-          const path = req.files[0].path
+          const path = req.files[0].path;
           fs.unlink(path, (err) => {
             if (err) {
-              throw createError("something went went wrong")
+              throw createError("something went went wrong");
             }
-          })
-
+          });
         }
         res.status(400).json({
           errors: {
@@ -60,7 +58,7 @@ class BookController {
         });
       }
     } catch (e) {
-      console.log(e)
+      console.log(e);
       res.status(500).json({
         errors: {
           book: {
@@ -148,6 +146,7 @@ class BookController {
         message: "Ok",
       });
     } catch (e) {
+      console.log(e);
       res.status(400).json({
         errors: {
           book: {
