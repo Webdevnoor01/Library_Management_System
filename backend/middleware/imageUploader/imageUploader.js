@@ -15,7 +15,7 @@ class ImageUploader {
           res.status(400).json({
             errors: {
               bookImg: {
-                msg: err.message,
+                msg: err,
               },
             },
           });
