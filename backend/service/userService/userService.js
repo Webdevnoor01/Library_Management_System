@@ -29,12 +29,12 @@ class UserService {
     }
   }
 
-  async findUserByPropertyAndRegister(model, query, libraryId) {
+  async findUserByPropertyAndRegister(model, query, lbId) {
     try {
       // First check that the library card is valid or not
 
-      const libraryCard = await libraryCardSearvice.findCardById(libraryId);
-      console.log(libraryCard);
+      const libraryCard = await libraryCardSearvice.findCardById(lbId);
+      console.log("libraryId:", lbId);
 
       if (libraryCard) {
         if (query._id) {
@@ -52,11 +52,8 @@ class UserService {
         }
 
         const user = await model.findOne(query);
-        console.log(user);
         if (!user) {
-          if (libraryId === user.libraryId) {
-            return false;
-          }
+          return false;
         } else {
           if (user.libraryId == libraryCard.libraryId) {
             if (user.studentName) {
@@ -77,6 +74,7 @@ class UserService {
         throw new Error("Please type valid library id");
       }
     } catch (e) {
+      console.log(e);
       throw new Error(e.message);
     }
   }
@@ -109,22 +107,24 @@ class UserService {
     }
   }
 
-  async findRequestedBook(model, userId){
+  async findRequestedBook(model, userId) {
     try {
-      const requestedBooks = await model.findById(userId, "requestedBookList" ).populate("requestedBookList")
-      if(!requestedBooks){
+      const requestedBooks = await model
+        .findById(userId, "requestedBookList")
+        .populate("requestedBookList");
+      if (!requestedBooks) {
         return {
-          error:true,
-          message:"You don't have any requested book"
-        }
+          error: true,
+          message: "You don't have any requested book",
+        };
       }
       return {
-        error:false,
-        data:requestedBooks.requestedBookList
-      }
+        error: false,
+        data: requestedBooks.requestedBookList,
+      };
     } catch (e) {
-      console.log(e)
-      throw createError(e.message)
+      console.log(e);
+      throw createError(e.message);
     }
   }
 }
