@@ -7,25 +7,38 @@ const notificaitonSchema = Schema(
       required: true,
     },
     sender: {
-      libraryAdmin: {
-        type: Types.ObjectId,
-        ref: "LibraryAdmin",
+      role: {
+        type: String,
+        required: true,
       },
-      libraryAssistant: {
+      userId: {
         type: Types.ObjectId,
-        ref: "LibraryStaff",
+        required: true,
       },
-    },
-    receiver: {
-      student: {
-        type: Types.ObjectId,
-        ref: "Student",
-      },
-      teacher: {
-        type: Types.ObjectId,
-        ref: "Teacher",
+      userName: {
+        type: String,
+        required: true,
       },
     },
+    reciever: {
+      role: {
+        type: Array ,
+        required: true,
+      },
+      userId: {
+        typw: Types.ObjectId,
+      },
+      userName: {
+        type: String,
+      },
+    },
+    isMarked:{
+      type:Boolean,
+      required:true,
+      default:false
+    }
   },
   { timestamps: true }
 );
+
+module.exports = new model("Notification",notificaitonSchema)
