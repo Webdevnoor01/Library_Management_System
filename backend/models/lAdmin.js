@@ -21,6 +21,11 @@ const adminSchema = Schema({
     type: String,
     required: true,
   },
+  userRole:{
+    type:String,
+    required:true,
+    default:"libAdmin"
+  }
 });
 
 const LibraryAdmin = new model("LibraryAdmin", adminSchema);
