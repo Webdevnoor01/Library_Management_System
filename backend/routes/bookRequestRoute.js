@@ -3,7 +3,7 @@ const fequestedBookAuthorization = require("../middleware/authorization/requeste
 
 const router = require("express").Router();
 
-router.post("/", bookRequestController.newBookRequest);
+router.post("/",fequestedBookAuthorization.authorized, bookRequestController.newBookRequest);
 router.get("/find", bookRequestController.findRequestedBook)
 router.get("/find/user/:userId",fequestedBookAuthorization.authorized, bookRequestController.findUserRequestedBook)
 
