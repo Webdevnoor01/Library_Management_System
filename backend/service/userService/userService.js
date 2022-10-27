@@ -1,5 +1,4 @@
 const createError = require("http-errors");
-const libraryCardSearvice = require("../libraryCardService/index");
 
 class UserService {
   async createNewUser(model, payload) {
@@ -11,15 +10,18 @@ class UserService {
     }
   }
 
-  async findUserByProperty(model, query) {
+  async findUserByProperty(model, query, requiredFields=null) {
     try {
+      if(query === undefined){
+        
+        return await model.find({}, "studentName email phone address requestedBookList libraryId ")
+      }
       if (query._id) {
-        const user = await model.findById(query.value);
+        const user = await model.findById(query._id, requiredFields);
         if (!user) return false;
         return user;
       }
-      const user = await model.findOne(query);
-      console.log(user);
+      const user = await model.findOne(query, requiredFields);
 
       if (!user) return false;
 
@@ -29,57 +31,7 @@ class UserService {
     }
   }
 
-  async findUserByPropertyAndRegister(model, query, lbId) {
-    try {
-      // First check that the library card is valid or not
-
-      const libraryCard = await libraryCardSearvice.findCardById(lbId);
-      console.log("libraryId:", lbId);
-
-      if (libraryCard) {
-        if (query._id) {
-          const user = await model.findById(query.value);
-
-          if (!user) return false;
-          if (
-            user.libraryId === libraryCard.libraryId &&
-            user.studentName === libraryCard.userName
-          ) {
-            return true;
-          } else {
-            throw new Error("Please type valid library id");
-          }
-        }
-
-        const user = await model.findOne(query);
-        if (!user) {
-          return false;
-        } else {
-          if (user.libraryId == libraryCard.libraryId) {
-            if (user.studentName) {
-              if (user.studentName == libraryCard.userName) {
-                return false;
-              }
-            }
-            if (user.teacherName) {
-              if (user.teacherName == libraryCard.userName) {
-                return false;
-              }
-            }
-          } else {
-            throw new Error("Please type valid library id");
-          }
-        }
-      } else {
-        throw new Error("Please type valid library id");
-      }
-    } catch (e) {
-      console.log(e);
-      throw new Error(e.message);
-    }
-  }
-
-  async updateUserRef(model, query, payload) {
+  async updateUserRef(model, query, refField, payload) {
     try {
       let user;
       if (query._id) {
@@ -87,14 +39,14 @@ class UserService {
           { _id: query._id },
           {
             $push: {
-              requestedBookList: payload.requestedBookId,
+              [refField]: payload,
             },
           }
         );
       } else {
         user = await model.findOneAndUpdate(query, {
           $push: {
-            requestedBookList: query.requestedBookId,
+            [refField]: query.requestedBookId,
           },
         });
       }
@@ -127,6 +79,7 @@ class UserService {
       throw createError(e.message);
     }
   }
+
 }
 
 module.exports = new UserService();
