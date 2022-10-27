@@ -1,8 +1,14 @@
+// libraries
 const createError = require("http-errors");
+
+// Services
 const requestBookService = require("../../service/requestBookService/requestBookService");
 const userService = require("../../service/userService/userService");
-const Student = require("../../models/student");
-const findModel  = require("../../util/findModel")
+const bookService = require("../../service/bookService/bookService")
+const notificationService = require("../../service/notificationService/notificationService");
+
+// Utilities
+const findModel  = require("../../util/findModel");
 
 class BookRequest {
 
@@ -24,10 +30,28 @@ class BookRequest {
       const requsetedBook = await requestBookService.newBookRequest(payload);
       if (requsetedBook) {
         const user = await userService.updateUserRef(
-          Student,
+          findModel(req.userRole),
           { _id: userId },
-          { requestedBookId: requsetedBook._id }
+          "requestedBookList",
+          requsetedBook._id
         );
+
+        const book = await bookService.findBookByProperty({_id:bookId})
+
+        // Create payload to create new notification after sending book request
+        const notificationPayload ={
+          message:`${user.studentName ? user.studentName:user.teacherName} send a request to issue ${book.bookName} book `,
+          sender:{
+            role:req.userRole,
+            userId:userId,
+            userName:user.studentName || user.teacherName
+          },
+          reciever:{
+            role:["libAdmin", "Assistant", "Staff"],
+          }
+        }
+
+        const notification = await notificationService.createNotification(notificationPayload)
 
        
       }
