@@ -1,5 +1,7 @@
 const bcrypt = require("bcrypt");
+const createError = require("http-errors");
 const userService = require("../../../service/userService/userService");
+const libraryCardSearvice = require("../../../service/libraryCardService/index");
 const Student = require("../../../models/student");
 const tokenService = require("../../../service/token/tokenService");
 const RefreshToken = require("../../../models/tokens/refreshToken");
@@ -25,15 +27,16 @@ class AuthController {
       libraryId,
       role,
     } = req.body;
+    const userName = studentName || teacherName
 
     try {
-      const user = await userService.findUserByPropertyAndRegister(
-        findModel(userRole),
-        { libraryId: libraryId },
-        libraryId
-      );
+      const libraryCard = await libraryCardSearvice.findCardById(libraryId);
 
-      if (!user) {
+      const user = await userService.findUserByProperty(findModel(userRole), {
+        ...req.body,
+      });
+
+      if (!user && (libraryCard.userName === userName)) {
         // Hash the password
         const hasPassword = await bcrypt.hash(password, 10);
         let payload;
@@ -75,17 +78,24 @@ class AuthController {
           ...payload,
         });
 
+        if(!newUser){
+          throw createError("Something went wrong")
+        }
         res.status(200).json({
-          message: "New user created successfully",
+          message:"Ok",
+          user:new UserDto(newUser)
         });
-      } else {
-        res.status(400).json({
-          message: "User already exist",
-        });
+      }else{
+          if(!(libraryCard.userName === userName)){
+
+            throw createError("Please type valid library Id.")
+          }
+          throw createError("User already exist")
       }
+
     } catch (error) {
       console.log(error);
-      res.status(400).json({
+      res.status(500).json({
         message: error.message,
       });
     }
@@ -178,6 +188,8 @@ class AuthController {
       console.log(error);
     }
   }
+
+  
 }
 
 module.exports = new AuthController();
