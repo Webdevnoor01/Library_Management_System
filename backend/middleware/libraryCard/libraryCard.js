@@ -27,8 +27,8 @@ class LibraryCard {
             check("libraryId")
             .isString()
             .withMessage("libraryId must be a string")
-            .isLength({min:6})
-            .withMessage('libraryId mut be at least 6 characters like "cst_09"'),
+            .isLength({min:5})
+            .withMessage('libraryId mut be at least 5 characters like "cst_09"'),
 
             check("bookLimit")
             .isNumeric()
