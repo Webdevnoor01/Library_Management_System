@@ -16,7 +16,6 @@ class BookController {
     } = req.body;
 
     try {
-      console.log(req.files);
       const bookPayload = {
         bookName,
         authorName,
@@ -29,7 +28,6 @@ class BookController {
       };
 
       const isBook = await bookService.findBookByProperty({ isbn: isbn });
-      console.log("isBook: ", isBook);
       let book;
       if (isBook.error) {
         book = await bookService.createNewBook(bookPayload);
@@ -127,9 +125,6 @@ class BookController {
     const { id } = req.params;
     const body = req.body;
 
-    if (req.files) {
-      console.log("Ok");
-    }
     try {
       let payload = body;
       if (req.files) {
