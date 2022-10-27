@@ -17,7 +17,7 @@ router.get("/findBy", bookController.findBookByProperty);
 router.patch("/update/:id", bookController.updateBook);
 router.patch(
   "/update/img/:id",
-  imageUploader.uploadImage,
+  imageUploader.uploadImage("booksImg"),
   bookController.updateBook
 );
 
