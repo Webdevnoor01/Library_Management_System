@@ -14,7 +14,7 @@ const libraryStaffSchema = Schema(
       type: String,
       required: true,
     },
-    role: {
+    userRole: {
       type: String,
       required: true,
       enum: ["Assistant", "Staff"],
