@@ -22,7 +22,7 @@ const notificaitonSchema = Schema(
     },
     reciever: {
       role: {
-        type: Array ,
+        type: Array  || String,
         required: true,
       },
       userId: {
