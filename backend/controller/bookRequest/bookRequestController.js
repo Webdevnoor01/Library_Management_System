@@ -24,8 +24,8 @@ class BookRequest {
         payload
       );
 
-      if (isRequestedBook)
-        throw createError("You already send request for this book");
+      if (isRequestedBook.error)
+        throw createError(isRequestedBook.message);
 
       const requsetedBook = await requestBookService.newBookRequest(payload);
       if (requsetedBook) {
