@@ -1,16 +1,21 @@
+// Libraries
 const bcrypt = require("bcrypt");
 const createError = require("http-errors");
+
+// Services
 const userService = require("../../../service/userService/userService");
 const libraryCardSearvice = require("../../../service/libraryCardService/index");
-const Student = require("../../../models/student");
 const tokenService = require("../../../service/token/tokenService");
-const RefreshToken = require("../../../models/tokens/refreshToken");
-const UserDto = require("../../../userDTO/userDto");
 
+// Models
+const RefreshToken = require("../../../models/tokens/refreshToken");
+
+// Utility
+const UserDto = require("../../../userDTO/userDto");
 const findModel = require("../../../util/findModel");
 
 class AuthController {
-  async register(req, res, _next) {
+  async register(req, res) {
     const {
       studentName,
       teacherName,
@@ -96,12 +101,16 @@ class AuthController {
     } catch (error) {
       console.log(error);
       res.status(500).json({
-        message: error.message,
+        errors:{
+          registration:{
+            msg:e.message
+          }
+        }
       });
     }
   }
 
-  async login(req, res, _next) {
+  async login(req, res) {
     const { email, password, role } = req.body;
 
     try {
@@ -170,7 +179,7 @@ class AuthController {
     }
   }
 
-  async logout(req, res, _next) {
+  async logout(req, res) {
     const { refreshToken } = req.cookies;
     try {
       const deleteRefreshToken = await tokenService.removeRefreshToken(
@@ -189,7 +198,57 @@ class AuthController {
     }
   }
 
-  
+  async changePassword(req, res) {
+    const {oldPassword, newPassword, conformNewPassword} = req.body
+    const {userId} = req.params
+    
+    try {
+      const userRole = req.user.userRole
+      console.log("model: ", findModel(userRole))
+      const user = await userService.findUserByProperty(findModel(userRole),{_id:userId})
+
+
+      // verify old password
+      const isValidPassword = await bcrypt.compare(oldPassword, user.password)
+      if(!isValidPassword){
+        throw createError({
+          status:400,
+          message:"Wrong old password"
+        })
+      }
+
+      if(newPassword !== conformNewPassword){
+        throw createError({
+          status:400,
+          message:"new password and conform new password are not equal"
+        })
+      }
+      const hashPassword = await bcrypt.hash(newPassword,10)
+      const payload = {
+        password: hashPassword
+      }
+      console.log(payload)
+      const updatePassword = await userService.changePassword(findModel(userRole), userId,payload)
+      if(updatePassword.error){
+        throw createError({
+          message:updatePassword.message
+        })
+      }
+
+      return res.status(200).json({
+        message:"Password change successfully"
+      })
+    } catch (e) {
+      console.log(e)
+      res.status(e.status || 500).json({
+        errors:{
+          changePass:{
+            msg:e.message
+          }
+        }
+      })
+    }
+  }
 }
 
 module.exports = new AuthController();
