@@ -2,7 +2,8 @@ const router = require("express").Router();
 const studentValidator = require("../middleware/auth/teacherStudent/teacherStudent");
 const studentController = require("../controller/auth/teacherStudent/tsAuthController");
 const authenticateMiddleware = require("../middleware/authenticate/authenticate")
-const requestedBookAuthorization = require("../middleware/authorization/requestedBookAuthorization")
+const requestedBookAuthorization = require("../middleware/authorization/requestedBookAuthorization");
+const userService = require("../service/userService/userService");
 
 
 // Authentication related route
@@ -15,7 +16,5 @@ router.post(
 router.post("/login", studentController.login);
 router.post("/logout",authenticateMiddleware.authenticate, studentController.logout)
 
-// Library related route
-router.get("/issueBooks", authenticateMiddleware.authenticate, requestedBookAuthorization.authorized )
-
+router.patch("/change_password/:userId",authenticateMiddleware.authenticate, studentController.changePassword)
 module.exports = router;
