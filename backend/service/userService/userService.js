@@ -80,6 +80,43 @@ class UserService {
     }
   }
 
+  async deleteRequestedBook(model,query,fieldName, idBeDeleted){
+    try {
+      const requestedBookList = await model.updateOne(query,{$pull:{[fieldName]:idBeDeleted}})
+      if(!requestedBookList){
+        return {
+          error:true,
+          message:requestedBookList
+        }
+      }
+
+      return {
+        error:false,
+        data:requestedBookList
+      }
+    } catch (e) {
+      throw createError(e.message)
+    }
+  }
+
+  async changePassword(model, userId, payload){
+    try {
+      console.log("userId: ", userId)
+      const user = await model.findByIdAndUpdate(userId,{...payload})
+      if(!user){
+        return {
+          error:true,
+          message:user
+        }
+      }
+      return {
+        error:false,
+        data:user
+      }
+    } catch (e) {
+      throw createError(e.message)
+    }
+  }
 }
 
 module.exports = new UserService();
