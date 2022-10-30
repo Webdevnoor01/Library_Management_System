@@ -61,7 +61,7 @@ class StudentController {
     const { userId, fieldName, requestedBookId } = req.query;
     try {
       // Delete requested bookId from user requestedBookList
-      const requestedBookList = await userService.deleteRequestedBook(
+      const requestedBookList = await userService.deleteUserRef(
         findModel(req.user.userRole),
         { _id: userId },
         fieldName,
