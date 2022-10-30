@@ -24,9 +24,10 @@ const notificaitonSchema = Schema(
       role: {
         type: Array  || String,
         required: true,
+        default:String
       },
       userId: {
-        typw: Types.ObjectId,
+        type: Types.ObjectId,
       },
       userName: {
         type: String,
