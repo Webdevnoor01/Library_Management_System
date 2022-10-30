@@ -5,6 +5,7 @@ class RequestedBookAuthorization {
    async authorized(req, res, next) {
        const {accessToken} = req.cookies
        const userId = req.params.userId || req.query.userId
+       console.log("requestedBookAuthorizaion: ", userId)
         try {
             const user = await jwt.verify(accessToken, process.env.JWT_ACCES_TOKEN_SECRET)
             console.log("authorization: ", user)
