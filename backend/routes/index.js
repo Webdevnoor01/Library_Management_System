@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const libraryAdminRoute =require("./libraryAdminRoute")
 const libraryCardRoute = require("./libraryCard");
 const studentAuthRoute = require("./studentAuth");
 const studentRoute = require("./studentRoute")
@@ -8,7 +9,12 @@ const bookRequestRoute = require("../routes/bookRequestRoute");
 const profileRouter = require("./profileRoute")
 const authenticateMiddleware = require("../middleware/authenticate/authenticate");
 
-router.use("/api/v1/libraryCard", libraryCardRoute);
+
+// Admin Routes
+router.use("/api/v1/libAdmin", libraryAdminRoute )
+
+
+router.use("/api/v1/libraryCard", authenticateMiddleware.authenticate, libraryCardRoute);
 
 router.use("/api/v1/auth/student", studentAuthRoute);
 router.use("/api/v1/student",authenticateMiddleware.authenticate, studentRoute)
