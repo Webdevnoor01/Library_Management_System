@@ -11,12 +11,13 @@ const issuedBookSchema = Schema(
       required: true,
     },
     whoIssued: {
-      type: Types.ObjectId,
+      type: String,
       required: true,
     },
     renewDate: {
-      type: String,
+      type: Date,
       required: true,
+      default:Date.now()
     },
     isReturned: {
       type: Boolean,
