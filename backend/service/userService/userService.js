@@ -31,34 +31,6 @@ class UserService {
     }
   }
 
-  async updateUserRef(model, query, refField, payload) {
-    try {
-      let user;
-      if (query._id) {
-        user = await model.findByIdAndUpdate(
-          { _id: query._id },
-          {
-            $push: {
-              [refField]: payload,
-            },
-          }
-        );
-      } else {
-        user = await model.findOneAndUpdate(query, {
-          $push: {
-            [refField]: query.requestedBookId,
-          },
-        });
-      }
-
-      if (!user) return false;
-      return user;
-    } catch (e) {
-      console.log(e);
-      throw createError(e.message);
-    }
-  }
-
   async findRequestedBook(model, userId) {
     try {
       const requestedBooks = await model
@@ -79,20 +51,55 @@ class UserService {
       throw createError(e.message);
     }
   }
-
-  async deleteRequestedBook(model,query,fieldName, idBeDeleted){
+  async updateUserRef(model, query, refField, payload) {
     try {
-      const requestedBookList = await model.updateOne(query,{$pull:{[fieldName]:idBeDeleted}})
-      if(!requestedBookList){
+      let user;
+      if (query._id) {
+        user = await model.findByIdAndUpdate(
+          { _id: query._id },
+          {
+            $push: {
+              [refField]: payload,
+            },
+          }
+        );
+      } else {
+        user = await model.findOneAndUpdate(query, {
+          $push: {
+            [refField]: query.requestedBookId,
+          },
+        });
+      }
+
+      if (!user) return {
+        error:true,
+        message:`error to update ${refField}`
+      };
+      return {
+        error:false,
+        data:user
+      };
+    } catch (e) {
+      console.log(e);
+      throw createError(e.message);
+    }
+  }
+
+
+  async deleteUserRef(model,query,fieldName, idBeDeleted){
+    try {
+      
+      const deleteUserRef = await model.updateOne(query,{$pull:{[fieldName]:idBeDeleted}})
+      if(!deleteUserRef){
         return {
           error:true,
-          message:requestedBookList
+          message:`error to delete ${refField}`
         }
       }
 
       return {
         error:false,
-        data:requestedBookList
+        data:deleteUserRef
       }
     } catch (e) {
       throw createError(e.message)
