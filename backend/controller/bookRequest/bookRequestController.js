@@ -19,13 +19,13 @@ class BookRequest {
         bookId,
         userId,
       };
-
+      console.log("payload: ", payload)
       const isRequestedBook = await requestBookService.findRequestedBookByProperty(
         payload
       );
-
-      if (isRequestedBook.error)
-        throw createError(isRequestedBook.message);
+        console.log("isRequestedBook", isRequestedBook)
+      if (!isRequestedBook.error)
+        throw createError({message:"You already send request for this book"});
 
       const requsetedBook = await requestBookService.newBookRequest(payload);
       if (requsetedBook) {
@@ -35,16 +35,18 @@ class BookRequest {
           "requestedBookList",
           requsetedBook._id
         );
+        
 
         const book = await bookService.findBookByProperty({_id:bookId})
+        console.log("Book: ", book)
 
         // Create payload to create new notification after sending book request
         const notificationPayload ={
-          message:`${user.studentName ? user.studentName:user.teacherName} send a request to issue ${book.bookName} book `,
+          message:`${user.data.studentName ? user.data.studentName:user.data.teacherName} send a request to issue ${book.bookName} book `,
           sender:{
             role:req.userRole,
             userId:userId,
-            userName:user.studentName || user.teacherName
+            userName:user.data.studentName || user.data.teacherName
           },
           reciever:{
             role:["libAdmin", "Assistant", "Staff"],
