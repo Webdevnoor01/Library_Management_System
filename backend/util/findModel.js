@@ -1,25 +1,29 @@
 const Student = require("../models/student")
 const Teacher = require("../models/teacher")
-const LibAdmin = require("../models/lAdmin")
 const LibraryStaff = require("../models/libraryStaff")
+const LibraryAdmin = require("../models/lAdmin")
 
 
-function findModel(modelName){
-    if(modelName === "Student" || modelName === "student"){
+function findModel(userRole){
+    if(userRole === "Student" || userRole === "student"){
         return Student
     }
     
-    if(modelName === "Teacher" || modelName === "teacher"){
+    if(userRole === "Teacher" || userRole === "teacher"){
         
         return Teacher
     }
 
-    if(modelName === "libAdmin" || modelName === "LibAdmin"){
-        return LibAdmin
+    if(userRole === "libAdmin" || userRole === "LibAdmin"){
+        return LibraryAdmin
     }
-    if(modelName === "Assistant" || modelName === "assistant" || modelName === "Staff" || modelName === "staff"){
+
+    if(userRole === "Assistant" || userRole === "assistant" || userRole === "Staff" || userRole === "staff"){
         return LibraryStaff
     }
+
+    
+
 
 }
 
