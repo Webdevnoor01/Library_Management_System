@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken")
+const RefreshToken = require("../../models/tokens/refreshToken")
 const accessTokenSecret = process.env.JWT_ACCES_TOKEN_SECRET
 const refreshTokenSecret = process.env.JWT_REFRESH_TOKEN_SECRET
 
@@ -40,20 +41,20 @@ class TokenService {
         return await jwt.verify(refreshToken, refreshTokenSecret)
     }
 
-    async findRefreshToken(model, userId, refreshToken) {
-        const quary = { token: refreshToken, userId: userId }
-        console.log("query " + JSON.parse(JSON.stringify(quary)))
+    async findRefreshToken(userId, refreshToken) {
+        const query = { token: refreshToken, userId: userId }
+        console.log("query " + query)
 
-        return await model.findOne({ token: refreshToken, userId: userId })
+        return await RefreshToken.findOne({userId: userId })
 
     }
 
-    async updateRefreshToken(model, userId, refreshToken) {
-        return await model.updateOne({ userId: userId }, { token: refreshToken })
+    async updateRefreshToken(userId, refreshToken) {
+        return await RefreshToken.updateOne({ userId: userId }, { token: refreshToken })
     }
 
-    async removeRefreshToken(model, refreshToken) {
-        return await model.deleteOne({ token: refreshToken })
+    async removeRefreshToken(refreshToken) {
+        return await RefreshToken.deleteOne({ token: refreshToken })
     }
 
 
