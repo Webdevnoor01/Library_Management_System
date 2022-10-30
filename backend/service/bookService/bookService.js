@@ -28,10 +28,18 @@ class BookService {
     const { isbn, bookName, authorName } = query;
     try {
       if (query._id) {
-        return (
-          (options && (await Book.findById({ ...query }, options))) ||
-          (await Book.findById({ ...query }))
-        );
+        let book = options ?await Book.findById({ ...query }, options):await Book.findById({ ...query })
+        if(!book){
+          return{
+            error:true,
+            message:"Book Not found"
+          }
+        }
+        return {
+          error:false,
+          data:book
+        }
+       
       }
       let book;
       if (isbn && bookName && authorName) {
