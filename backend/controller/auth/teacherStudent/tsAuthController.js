@@ -111,13 +111,11 @@ class AuthController {
   }
 
   async login(req, res) {
-    const { email, password, role } = req.body;
-
+    const {userId, email, password, role } = req.body;
     try {
       const model = findModel(role);
-      const user = await userService.findUserByProperty(model, {
-        email: email,
-      });
+      const query = userId? {userId:userId} : {email:email};
+      const user = await userService.findUserByProperty(model,query);
       if (!user) {
         return res.status(400).json({
           errors: {
@@ -142,30 +140,41 @@ class AuthController {
       const tokenPayload = {
         _id: user._id,
         userRole: user.userRole,
+        userName:user.studentName || user.teacherName || user.name,
         activated: false,
       };
 
       const { accessToken, refreshToken } = await tokenService.generateTokens(
         tokenPayload
       );
-      await tokenService.storeRefreshToken(RefreshToken, {
-        token: refreshToken,
-        userId: user._id,
-      });
+
+      const isRefreshToken = await tokenService.findRefreshToken(user._id,refreshToken)
+      console.log("isRefreshToken:", isRefreshToken)
+      let updateRefreshToken = refreshToken
+      if(isRefreshToken){
+        updateRefreshToken =  await tokenService.updateRefreshToken(user._id, refreshToken)
+      }
+      if(!isRefreshToken){
+
+        await tokenService.storeRefreshToken(RefreshToken, {
+          token: refreshToken,
+          userId: user._id,
+        });
+      }
 
       res.cookie("accessToken", accessToken, {
         maxAge: 1000 * 60 * 60 * 24 * 30,
         httpOnly: true,
       });
-      res.cookie("refreshToken", refreshToken, {
-        maxAge: 1000 * 60 * 60 * 24 * 30,
+      res.cookie("refreshToken", updateRefreshToken, {
+        maxAge: 1000 * 60 * 60 * 24 * 365,
         httpOnly: true,
       });
 
       const userDto = new UserDto(user);
       res.status(200).json({
         user: userDto,
-        studentAuth: true,
+        auth: true,
       });
     } catch (e) {
       console.log(e);
