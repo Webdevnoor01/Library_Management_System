@@ -19,11 +19,11 @@ class BookRequest {
         bookId,
         userId,
       };
-      console.log("payload: ", payload)
+      // console.log("payload: ", payload)
       const isRequestedBook = await requestBookService.findRequestedBookByProperty(
         payload
       );
-        console.log("isRequestedBook", isRequestedBook)
+        // console.log("isRequestedBook", isRequestedBook)
       if (!isRequestedBook.error)
         throw createError({message:"You already send request for this book"});
 
@@ -38,7 +38,6 @@ class BookRequest {
         
 
         const book = await bookService.findBookByProperty({_id:bookId})
-        console.log("Book: ", book)
 
         // Create payload to create new notification after sending book request
         const notificationPayload ={
@@ -120,6 +119,7 @@ class BookRequest {
       })
     }
   }
+
 
 
 }
