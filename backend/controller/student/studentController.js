@@ -111,10 +111,11 @@ class StudentController {
   }
 
   async getNotification(req, res) {
-    const { role, _id: userId, studentName: userName } = req.user;
+    const { userRole, _id: userId, userName } = req.user;
 
     try {
-      const query = {reciever:{ role, userId, userName }};
+      const query = {"reciever.role":userRole,"reciever.userId":userId,"reciever.userName":userName };
+      console.log(query)
       const notification = await notificationService.findNotificationByProperty(
         query
       );
@@ -127,7 +128,7 @@ class StudentController {
 
       res.status(200).json({
         status: "Ok",
-        notifications: notification,
+        notifications: notification.data,
       });
     } catch (e) {
         res.status(500).json({
