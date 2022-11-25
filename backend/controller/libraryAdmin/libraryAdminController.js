@@ -100,7 +100,6 @@ class LibraryAdminController {
             }
             const user = await userService.findUserByProperty(findModel(requestedUserRole),{_id:userId},"studentName teacherName userRole ")
             const book = await bookService.findBookByProperty({_id:bookId}, "bookName")
-            console.log("book", book)
             if(!user && book.error){
                 throw createError({
                     message:"User and book not found"
