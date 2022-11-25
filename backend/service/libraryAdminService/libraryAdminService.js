@@ -14,7 +14,6 @@ class LibraryAdminService {
                     message:libAdmin
                 }
             }
-
             return {
                 error:false,
                 data:libAdmin
@@ -35,22 +34,18 @@ class LibraryAdminService {
                         message:libAdmin
                     }
                 }
-
                 return {
                     error:false,
                     message:libAdmin
                 }
             }
-
             libAdmin = await LibraryAdmin.findOne(query)
-
             if(!libAdmin){
                 return {
                     error:true,
                     message:libAdmin
                 }
             }
-
             return {
                 error:false,
                 message:libAdmin
