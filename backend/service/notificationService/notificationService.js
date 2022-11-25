@@ -41,7 +41,7 @@ class NotificationService {
      */
     async findNotificationByProperty(query){
         try {
-            const notification = await Notification.find(query)
+            const notification = await Notification.find(query,"message")
             if(!notification.length >0 ){
                 return {
                     error:true,
