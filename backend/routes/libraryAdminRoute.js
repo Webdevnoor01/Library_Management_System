@@ -4,10 +4,13 @@ const libraryAdmiinValidator = require("../middleware/libraryAdmin/libraryAdminV
 
 const LibraryAdminController = require("../controller/libraryAdmin/libraryAdminController")
 const libraryAdminController = require("../controller/libraryAdmin/libraryAdminController")
+
 const authController = require("../controller/auth/teacherStudent/tsAuthController")
 const adminAuthorization = require("../middleware/authorization/adminAuthorization")
 const authenticateMiddleware  = require("../middleware/authenticate/authenticate")
 
+const libraryStaffValidator = require("../middleware/libraryStaff/libraryStaffValidator")
+const libraryStaffControler = require("../controller/libraryStaff/libraryStaffController")
 
 
 router.post(
@@ -29,4 +32,12 @@ router.post(
     LibraryAdminController.acceptRequestedBook
     )
 
+// Create library staff
+router.post(
+    "/create/staff",
+    
+    libraryStaffValidator.validate(), 
+    libraryStaffValidator.validationHandler,
+    libraryStaffControler.register
+    )
 module.exports = router
