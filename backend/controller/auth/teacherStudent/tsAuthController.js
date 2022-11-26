@@ -40,7 +40,11 @@ class AuthController {
       const user = await userService.findUserByProperty(findModel(userRole), {
         ...req.body,
       });
-
+      if(!libraryCard){
+        throw createError({
+          message:"Please provide valid library id"
+        })
+      }
       if (!user && (libraryCard.userName === userName)) {
         // Hash the password
         const hasPassword = await bcrypt.hash(password, 10);
@@ -98,8 +102,8 @@ class AuthController {
           throw createError("User already exist")
       }
 
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      console.log(e);
       res.status(500).json({
         errors:{
           registration:{
@@ -113,6 +117,11 @@ class AuthController {
   async login(req, res) {
     const {userId, email, password, role } = req.body;
     try {
+      if(!email, !password, !role){
+        throw createError({
+          message:"Please provide valid email password and role"
+        })
+      }
       const model = findModel(role);
       const query = userId? {userId:userId} : {email:email};
       const user = await userService.findUserByProperty(model,query);
