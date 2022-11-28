@@ -30,7 +30,7 @@ class AuthController {
       userRole,
       address,
       libraryId,
-      role,
+      roles,
     } = req.body;
     const userName = studentName || teacherName
 
@@ -64,7 +64,7 @@ class AuthController {
             userRole,
             address,
             libraryId,
-            role: role || null,
+            roles: roles || null,
           };
         }
 
@@ -79,7 +79,7 @@ class AuthController {
             userRole,
             address,
             libraryId,
-            role,
+            roles,
           };
         }
 
