@@ -11,6 +11,7 @@ const authenticateMiddleware  = require("../middleware/authenticate/authenticate
 
 const libraryStaffValidator = require("../middleware/libraryStaff/libraryStaffValidator")
 const libraryStaffControler = require("../controller/libraryStaff/libraryStaffController")
+const libraryStaffService = require("../service/libraryStaffService/libraryStaffService")
 
 
 router.post(
@@ -39,5 +40,23 @@ router.post(
     libraryStaffValidator.validate(), 
     libraryStaffValidator.validationHandler,
     libraryStaffControler.register
+    )
+router.get(
+    "/find/staff",
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
+    libraryAdminController.findLibraryStaff
+    )
+router.patch(
+    "/update/staff/:staffId",
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
+    libraryAdminController.updateLibraryStaff
+    )
+router.delete(
+    "/delete/staff/:staffId", 
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
+    libraryAdminController.deleteLibraryStaff
     )
 module.exports = router
