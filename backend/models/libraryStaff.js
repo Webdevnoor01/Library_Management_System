@@ -18,6 +18,10 @@ const libraryStaffSchema = Schema(
       type: String,
       required: true,
     },
+    avatar:{
+      type:String,
+      default:null
+    },
     userRole: {
       type: String,
       required: true,
