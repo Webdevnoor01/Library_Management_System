@@ -1,6 +1,7 @@
 const createError = require("http-errors")
 const libraryStaffService = require("../../service/libraryStaffService/libraryStaffService")
 const bcrypt = require("bcrypt")
+const UserDto = require("../../userDTO/userDto")
 class LibraryStaffController {
     async register(req, res){
         const {name, email, phone, password, userRole } = req.body
@@ -14,7 +15,7 @@ class LibraryStaffController {
                 userRole
             }
 
-            const isLibraryStaff = await libraryStaffService.findLibraryStaffByProperty("email", email)
+            const isLibraryStaff = await libraryStaffService.findLibraryStaffByProperty({email:email})
             console.log(isLibraryStaff.data)
             if(!isLibraryStaff.error){
                 throw createError({
@@ -33,7 +34,7 @@ class LibraryStaffController {
             }
             res.status(200).json({
                 message:`${userRole} has been created`,
-                data:libraryStaff.data
+                data: new UserDto(libraryStaff.data) 
             })
         } catch (e) {
             res.status(e.message.status || 500).json({
