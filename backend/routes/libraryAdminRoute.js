@@ -37,6 +37,8 @@ router.post(
 router.post(
     "/create/staff",
     
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
     libraryStaffValidator.validate(), 
     libraryStaffValidator.validationHandler,
     libraryStaffControler.register
