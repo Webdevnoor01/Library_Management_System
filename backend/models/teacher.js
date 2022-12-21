@@ -59,13 +59,13 @@ const teacherSchema = Schema(
     issuedBookList: [
       {
         type: Types.ObjectId,
-        ref: "IssuedBooks",
+        ref: "Book",
       },
     ],
     requestedBookList: [
       {
         type: Types.ObjectId,
-        ref: "RequestedBooks",
+        ref: "RequestedBook",
       },
     ],
     fine: [
