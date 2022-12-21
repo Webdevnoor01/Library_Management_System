@@ -26,7 +26,6 @@ class BookController {
         almirahNo: +almirahNo,
         category,
       };
-
       const isBook = await bookService.findBookByProperty({ isbn: isbn });
       let book;
       if (isBook.error) {
