@@ -71,7 +71,7 @@ const studentSchema = Schema(
     issuedBookList: [
       {
         type: Types.ObjectId,
-        ref: "IssuedBooks",
+        ref: "Book",
       },
     ],
     requestedBookList: [
