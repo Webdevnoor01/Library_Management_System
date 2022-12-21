@@ -5,12 +5,14 @@ const findModel = require("../../util/findModel");
 const createError = require("http-errors");
 
 class StudentController {
+
   async findRequestedBook(req, res) {
     const { userId } = req.params;
+    console.log(findModel(req.user.userRole))
 
     try {
       const requestedBooks = await userService.findRequestedBook(
-        findModel(req.userRole),
+        findModel(req.user.userRole),
         userId
       );
       if (requestedBooks.error) {
@@ -31,13 +33,39 @@ class StudentController {
       });
     }
   }
+  async findIssuedBooks(req, res){
+    const {_id:userId, userRole} = req.user
+    try {
+      const issuedBooks = await userService.findIssuedBooks(findModel(userRole), userId)
+      if(issuedBooks.error){
+        throw createError({
+          message:{
+            txt:issuedBooks.message
+          }
+        })
+      }
+      res.status(200).json({
+        message:"your issued books",
+        data: await issuedBooks.data
+      })
+    } catch (e) {
+      console.log(e)
+      res.status(e.message.status || 500).json({
+        errors:{
+          student:{
+            msg:e.message.txt
+          }
+        }
+      })
+    }
+  }
 
   async findStudents(req, res) {
     try {
       const students = await userService.findUserByProperty(
         findModel(req.user.userRole),
         { _id: req.user._id },
-        "studentName email phone requestedBookList"
+        "studentName email phone requestedBookList issuedBookList"
       );
       if (!students) {
         throw createError("Student not found");
@@ -60,6 +88,11 @@ class StudentController {
   async deleteRequestedBook(req, res) {
     const { userId, fieldName, requestedBookId } = req.query;
     try {
+      if(!(userId && fieldName && requestedBookId)) {
+        throw createError({
+          message:"Please provide userId, fieldName, and requestedBookId"
+        })
+      }
       // Delete requested bookId from user requestedBookList
       const requestedBookList = await userService.deleteUserRef(
         findModel(req.user.userRole),
@@ -102,7 +135,7 @@ class StudentController {
     } catch (e) {
       res.status(500).json({
         errors: {
-          student: {
+          [req.user.userRole]: {
             msg: e.message,
           },
         },
@@ -115,7 +148,6 @@ class StudentController {
 
     try {
       const query = {"reciever.role":userRole,"reciever.userId":userId,"reciever.userName":userName };
-      console.log(query)
       const notification = await notificationService.findNotificationByProperty(
         query
       );
