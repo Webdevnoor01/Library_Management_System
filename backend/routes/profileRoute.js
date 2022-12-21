@@ -5,7 +5,7 @@ const imageUploader = require("../middleware/imageUploader/imageUploader")
 
 
 
-router.patch("/update/:userId",profileController.update)
-router.patch("/update/avatar/:userId",imageUploader.uploadImage("userAvatar"), profileController.update)
+router.patch("/update",profileController.update)
+router.patch("/update/avatar",imageUploader.uploadImage("userAvatar"), profileController.update)
 
 module.exports = router
