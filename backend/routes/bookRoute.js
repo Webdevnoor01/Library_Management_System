@@ -3,10 +3,14 @@ const router = require("express").Router();
 const bookController = require("../controller/book/bookController");
 const bookValidator = require("../middleware/book/bookValidator");
 const imageUploader = require("../middleware/imageUploader/imageUploader");
+const authenticateMiddlware = require("../middleware/authenticate/authenticate")
+const bookCUDauthorization = require("../middleware/authorization/bookCUDauthorization")
 
 router.post(
   "/create",
-  imageUploader.uploadImage,
+  authenticateMiddlware.authenticate,
+  bookCUDauthorization.authorized,
+  imageUploader.uploadImage("booksImg"),
   bookValidator.validate(),
   bookValidator.validationHandler,
   bookController.create
