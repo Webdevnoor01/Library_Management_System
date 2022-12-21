@@ -7,10 +7,16 @@ const findModel = require("../../util/findModel");
 class ProfileController {
 
     async update(req, res){
-        const {userId} = req.params
+        const {userRole, _id:userId} = req.user
         let payload;
         try {
-
+            if(userRole === "Assistant" || userRole==="Staff" ||userRole === "Student" || userRole === "Teacher"){
+                if(req.body.userRole){
+                    throw createError({
+                        message:"You cant update userRole"
+                    })
+                }
+            }
             payload = req.files ? { avatar:req.files[0].path}:req.body
             if(req.body.password){
                 throw createError("You can't update password")
@@ -47,6 +53,7 @@ class ProfileController {
                 
             })
         } catch (e) {
+            console.log(e)
             if(req.files){
                 const path =req.files[0].path
 
