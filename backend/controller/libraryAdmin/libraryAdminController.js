@@ -22,10 +22,10 @@ class LibraryAdminController {
     const { name, userId, email, phone, password } = req.body;
 
     try {
-      // const isLibAdmin = await libraryAdminService.findByProperty({email:email})
-      // if(isLibAdmin.error){
-      //     throw createError(isLibAdmin.message)
-      // }
+      const isLibAdmin = await libraryAdminService.findByProperty({email:email})
+      if(isLibAdmin.error){
+          throw createError(isLibAdmin.message)
+      }
 
       // Hash the password
       const hashPassword = await bcrypt.hash(password, 10);
@@ -161,7 +161,7 @@ class LibraryAdminController {
         findModel(requestedUserRole),
         { _id: userId },
         "issuedBookList",
-        issuedBook.data._id
+        issuedBook.data.bookId
       );
 
       const deleteUserRef = await userService.deleteUserRef(
