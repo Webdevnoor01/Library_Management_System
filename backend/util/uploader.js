@@ -39,7 +39,6 @@ function uploader(
             }
         }
     })
-
     return upload;
 
 }
