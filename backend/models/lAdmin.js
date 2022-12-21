@@ -17,6 +17,10 @@ const adminSchema = Schema({
     type: Number,
     required: true,
   },
+  avatar:{
+    type:String,
+    default:null
+  },
   password: {
     type: String,
     required: true,
