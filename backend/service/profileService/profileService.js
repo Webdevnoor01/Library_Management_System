@@ -8,7 +8,7 @@ class ProfileService {
             if(!profile) {
                 return {
                     error:true,
-                    message:"Error to update profile"
+                    message:profile
                 }
             }
             return {
