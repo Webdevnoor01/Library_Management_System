@@ -158,7 +158,6 @@ class AuthController {
       );
 
       const isRefreshToken = await tokenService.findRefreshToken(user._id,refreshToken)
-      console.log("isRefreshToken:", isRefreshToken)
       let updateRefreshToken = refreshToken
       if(isRefreshToken){
         updateRefreshToken =  await tokenService.updateRefreshToken(user._id, refreshToken)
@@ -222,7 +221,6 @@ class AuthController {
     
     try {
       const userRole = req.user.userRole
-      console.log("model: ", findModel(userRole))
       const user = await userService.findUserByProperty(findModel(userRole),{_id:userId})
 
 
@@ -245,7 +243,6 @@ class AuthController {
       const payload = {
         password: hashPassword
       }
-      console.log(payload)
       const updatePassword = await userService.changePassword(findModel(userRole), userId,payload)
       if(updatePassword.error){
         throw createError({
