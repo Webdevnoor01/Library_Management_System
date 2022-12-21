@@ -16,17 +16,17 @@ class LibraryStaffController {
             }
 
             const isLibraryStaff = await libraryStaffService.findLibraryStaffByProperty({email:email})
-            console.log(isLibraryStaff.data)
+            console.log(!isLibraryStaff.error)
             if(!isLibraryStaff.error){
                 throw createError({
                     message:{
                         status:400,
-                        msg:`${userRole} already exist`
+                        txt:`${userRole} already exist`
                     }
                 })
+                
             }
             const libraryStaff = await libraryStaffService.create(payload)
-            console.log(libraryStaff)
             if(libraryStaff.error){
                 throw createError({
                     message:libraryStaff.message
@@ -40,7 +40,7 @@ class LibraryStaffController {
             res.status(e.message.status || 500).json({
                 errors:{
                     libraryStaff:{
-                        msg:e.message.msg
+                        msg:e.message.txt
                     }
                 }
             })
