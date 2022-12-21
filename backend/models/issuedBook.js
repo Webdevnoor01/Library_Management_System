@@ -9,6 +9,7 @@ const issuedBookSchema = Schema(
     bookId: {
       type: Types.ObjectId,
       required: true,
+      ref:"Book"
     },
     whoIssued: {
       type: String,
