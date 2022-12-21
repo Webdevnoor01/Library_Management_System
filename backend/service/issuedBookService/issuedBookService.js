@@ -51,6 +51,7 @@ class IssudBookService {
       throw createError(e.message);
     }
   }
+  
 }
 
 module.exports = new IssudBookService();
