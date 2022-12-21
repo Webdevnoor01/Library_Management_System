@@ -27,19 +27,24 @@ class LibraryStaffService {
   async findLibraryStaffByProperty(query) {
     try {
       let libraryStaff;
-      if (query) {
-        if (query.id) {
-          libraryStaff = await LibraryStaff.findById(query.id, "name email phone userRole avatar");
-        }
+
+      if (query.id) {
+        libraryStaff = await LibraryStaff.findById(
+          query.id,
+          "name email phone userRole avatar"
+        );
       } else if (query === undefined) {
-        libraryStaff = await LibraryStaff.find({},"name email phone userRole avatar");
+        libraryStaff = await LibraryStaff.find(
+          {},
+          "name email phone userRole avatar"
+        );
       } else {
         libraryStaff = await LibraryStaff.findOne(
           query,
           "name email phone userRole"
         );
+        console.log("libraryStaff: ", libraryStaff);
       }
-
       if (!libraryStaff) {
         return {
           error: true,
@@ -76,22 +81,22 @@ class LibraryStaffService {
     }
   }
 
-  async update(staffId, payload){
+  async update(staffId, payload) {
     try {
-        console.log(payload)
-        const staff = await LibraryStaff.findByIdAndUpdate(staffId, payload)
-        if(!staff){
-            return {
-                error:true,
-                message:"There was a problem to updta this staff"
-            }
-        }
+      console.log(payload);
+      const staff = await LibraryStaff.findByIdAndUpdate(staffId, payload);
+      if (!staff) {
         return {
-            error:false,
-            data:new UserDto(staff)
-        }
+          error: true,
+          message: "There was a problem to updta this staff",
+        };
+      }
+      return {
+        error: false,
+        data: new UserDto(staff),
+      };
     } catch (e) {
-        throw createError(e.message)
+      throw createError(e.message);
     }
   }
 }
