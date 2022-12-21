@@ -1,4 +1,5 @@
 const createError = require("http-errors");
+const Books = require("../../models/books")
 
 class UserService {
   async createNewUser(model, payload) {
@@ -49,6 +50,24 @@ class UserService {
     } catch (e) {
       console.log(e);
       throw createError(e.message);
+    }
+  }
+  async findIssuedBooks(model, userId){
+    try {
+      const issuedBooks = await model.findById(userId, "issuedBookList").populate("issuedBookList")
+      if(issuedBooks.length <=0){
+        return {
+          error:true,
+          message:"You dont have any issued books"
+        }
+      }
+
+      return {
+        error:false,
+        data:issuedBooks.issuedBookList
+      }
+    } catch (e) {
+      throw createError(e.message)
     }
   }
   async updateUserRef(model, query, refField, payload) {
