@@ -3,8 +3,8 @@ const uploader = require("../../util/uploader");
 class ImageUploader {
   
   uploadImage(destination) {
-
     return (req, res, next) =>{
+      console.log("image uploader ")
       try {
         const upload = uploader(
           destination,
@@ -23,6 +23,7 @@ class ImageUploader {
               },
             });
           } else {
+            console.log("next called")
             next();
           }
         });
