@@ -14,7 +14,7 @@ app.use(cookieParser())
 app.use(router)
 
 
-app.use((err, req, res, next)=>{
+app.use((err, _req, res, _next)=>{
     if(err){
         res.status(err.status || 500).json({
             errors:{
