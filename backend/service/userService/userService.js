@@ -127,7 +127,6 @@ class UserService {
 
   async changePassword(model, userId, payload){
     try {
-      console.log("userId: ", userId)
       const user = await model.findByIdAndUpdate(userId,{...payload})
       if(!user){
         return {
