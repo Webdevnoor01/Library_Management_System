@@ -11,4 +11,16 @@ router.patch(
   passwordController.changePassword
 );
 
+router.post(
+  "/forgot/send-otp/:userId",
+  passwordUpdateAuthorization.authorized,
+  passwordController.sendOtp
+);
+
+router.post(
+  "/forgot/verify-otp/:userId",
+  passwordUpdateAuthorization.authorized,
+  passwordController.verifyOtp
+);
+
 module.exports = router;
