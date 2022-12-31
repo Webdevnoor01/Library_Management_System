@@ -53,8 +53,6 @@ class BookRequest {
         }
 
         const notification = await notificationService.createNotification(notificationPayload)
-
-       
       }
 
       if (!requsetedBook) throw createError("something went wrong.");
