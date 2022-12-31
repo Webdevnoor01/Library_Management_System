@@ -11,6 +11,10 @@ const issuedBookSchema = Schema(
       required: true,
       ref:"Book"
     },
+    bookName:{
+      type: String,
+      require:true,
+    },
     whoIssued: {
       type: String,
       required: true,
