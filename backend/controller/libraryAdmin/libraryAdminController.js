@@ -15,16 +15,19 @@ const findModel = require("../../util/findModel");
 const { renewDate } = require("../../util/generateRenewData");
 
 const UserDto = require("../../userDTO/userDto");
+const fineService = require("../../service/fineService/fineService");
+const returnBookService = require("../../service/returnBookService/returnBookService");
 
 class LibraryAdminController {
-    
   async createAdmin(req, res) {
     const { name, userId, email, phone, password } = req.body;
 
     try {
-      const isLibAdmin = await libraryAdminService.findByProperty({email:email})
-      if(isLibAdmin.error){
-          throw createError(isLibAdmin.message)
+      const isLibAdmin = await libraryAdminService.findByProperty({
+        email: email,
+      });
+      if (isLibAdmin.error) {
+        throw createError(isLibAdmin.message);
       }
 
       // Hash the password
@@ -59,7 +62,35 @@ class LibraryAdminController {
       });
     }
   }
-
+  async findUserRequestedBook(req, res){
+    const {userId} = req.params
+    try {
+      const requestedBookPayload = {
+        userId
+      }
+      const requestedBooks = await requestedBookService.findAllRequestedBook(requestedBookPayload)
+      if(!requestedBooks.error){
+        throw createError({
+          message:{
+            txt:requestedBooks.message
+          }
+        })
+      }
+      res.status(200).json({
+        message:`total ${requestedBooks.data.length} book request send this user`,
+        requestedBooks:requestedBooks.data
+      })
+    } catch (e) {
+      console.log("findUserRequestdBooks-libraryAdminController: ", e)
+      res.status(e.message.status || 500).json({
+        errors:{
+          libraryAdmin:{
+            msg:e.message.txt || e.message
+          }
+        }
+      })
+    }
+  }
   async acceptRequestedBook(req, res) {
     const { requestedBookId, requestedUserRole } = req.body;
 
@@ -81,10 +112,17 @@ class LibraryAdminController {
           message: "You don't send requst for this book",
         });
       }
+      const isBook = await bookService.findBookByProperty({
+        _id: isRequestedBook?.data?.bookId,
+      });
+      if (isBook.error) {
+        throw createError({
+          message: isBook.message,
+        });
+      }
 
       // Check that you are issued this book or not
       const { userId, bookId } = isRequestedBook.data;
-      console.log("bookData", isRequestedBook.data);
       const isIssued = await issuedBookService.findIssuedBookByProperty({
         userId: userId,
         bookId: bookId,
@@ -99,6 +137,7 @@ class LibraryAdminController {
       const issuedBookPayload = {
         userId: userId,
         bookId: bookId,
+        bookName: isBook.data.bookName,
         whoIssued: req.user.userName,
         renewDate: `${renewDate()}`,
       };
@@ -179,6 +218,7 @@ class LibraryAdminController {
         deleteRequestedBookId: !deleteUserRef.error,
       });
     } catch (e) {
+
       res.status(e.status || 500).json({
         errors: {
           libraryAdmin: {
@@ -296,15 +336,15 @@ class LibraryAdminController {
           },
         });
       }
-    //TODO: Fix this login later when you want to do it
-    //   if(( userRole !== "Assistant" )|| (userRole !== "Staff")){
-    //     throw createError({
-    //         message: {
-    //           status: 400,
-    //           txt: "You provide wrong userRole. Please provide valid userRole",
-    //         },
-    //       });
-    //   }
+      //TODO: Fix this login later when you want to do it
+      //   if(( userRole !== "Assistant" )|| (userRole !== "Staff")){
+      //     throw createError({
+      //         message: {
+      //           status: 400,
+      //           txt: "You provide wrong userRole. Please provide valid userRole",
+      //         },
+      //       });
+      //   }
 
       const staff = await libraryStaffService.update(staffId, payload);
       if (staff.error) {
@@ -325,6 +365,226 @@ class LibraryAdminController {
           },
         },
       });
+    }
+  }
+
+  async findUserFine(req, res) {
+    const { userId } = req.params;
+    console.log(req.params);
+    try {
+      if (!userId) {
+        throw createError({
+          message: {
+            status: 400,
+            txt: "userId is required. please give them as url params",
+          },
+        });
+      }
+      const findFineQuery = {
+        userId,
+      };
+      const userFine = await libraryAdminService.findUserFine(findFineQuery);
+      if (userFine.error) {
+        throw createError({
+          message: {
+            status: 400,
+            txt: userFine.message,
+          },
+        });
+      }
+      console.log("fines: ", userFine.data);
+      return res.status(200).json({
+        messaga: "Your fines",
+        fines: userFine.data,
+      });
+    } catch (e) {
+      console.log("findUserFine-libAdminController: ", e);
+      res.status(e.message.status || 500).json({
+        errors: {
+          libAdmin: {
+            msg: e.message.txt || e.message,
+          },
+        },
+      });
+    }
+  }
+
+  async payBookFine(req, res) {
+    const { userId, bookId, amount } = req.body;
+    const { userRole } = req.user;
+    try {
+      const fine = await fineService.findFineByBookId({ userId, bookId });
+      if (fine.error) {
+        throw createError({
+          message: {
+            status: 400,
+            txt: fine.message,
+          },
+        });
+      }
+
+      if (
+        fine.data.amount === amount ||
+        fine.data.paidAmount + amount >= amount
+      ) {
+        const deleteFine = await fineService.deleteFine({ _id: fine.data._id });
+        if (deleteFine.error) {
+          return {
+            error: true,
+            message: deleteFine.message,
+          };
+        }
+
+        const deleteUserRef = await userService.deleteUserRef(
+          findModel(userRole),
+          { _id: userId },
+          "fine",
+          fine.data._id
+        );
+
+        const isIssuedBook = await issuedBookService.findIssuedBookByProperty({
+          bookId,
+        });
+        const updateIssuedBookPayload = {
+          renewDate: renewDate(15),
+        };
+        const issuedBook = await issuedBookService.updateIssuedBook(
+          isIssuedBook.data._id,
+          updateIssuedBookPayload
+        );
+        return res.status(200).json({
+          messaga: "Your fine is cleared. Now you can return your book",
+          deleteUserRef: !deleteUserRef.error,
+          updateRenewData: !issuedBook.error,
+          deleteFine: !deleteFine.error,
+        });
+      }
+
+      fine.data.paidAmount = amount;
+      await fine.data.save();
+
+      res.status(200).json({
+        message: "your fine is updated",
+        fine: fine.data,
+        renewDateUpdate: !issuedBook.error,
+      });
+    } catch (e) {
+
+      res.status(e.message.status || 500).json({
+        errors: {
+          libraryAdmin: {
+            msg: e.message.txt || e.message,
+          },
+        },
+      });
+    }
+  }
+
+  async findReturnRequest(req, res) {
+    const { userId } = req.params;
+    try {
+      const returnRequest = await returnBookService.findReturnRequest({
+        userId,
+      });
+      if (returnRequest.error) {
+        throw createError({
+          message: {
+            status: 400,
+            txt: returnRequest.message,
+          },
+        });
+      }
+      res.status(200).json({
+        message: `${returnRequest.data.length} return request found`,
+        returnRequest: returnRequest.data,
+      });
+    } catch (e) {
+      console.log("findReturnRequest-libraryAdminController: ", e);
+      res.status(e.message.status || 500).json({
+        errors: {
+          libraryAdmin: {
+            msg: e.message.txt || e.message,
+          },
+        },
+      });
+    }
+  }
+
+  async acceptReturnBookRequest(req, res) {
+    const { issuedBookId, userRole } = req.body;
+    const { userId } = req.params;
+    try {
+      if (!issuedBookId || !userId ||!userRole) {
+        throw createError({
+          message: {
+            status: 400,
+            txt: "uesrId, userRole and issuedBookId is required.",
+          },
+        });
+      }
+      const isReturnBookRequest = await returnBookService.findReturnRequest({issuedBookId})
+      if(isReturnBookRequest.error){
+        throw createError({
+          message:{
+            status:400,
+            txt:isReturnBookRequest.message
+          }
+        })
+      }
+
+      const deleteReturnBook = await returnBookService.deleteReturnBook({
+        userId,
+        issuedBookId,
+      });
+      if(deleteReturnBook.error){
+        throw createError({
+          message:{
+            txt:deleteReturnBook.message
+          }
+        })
+      }
+  
+      const updateReturnStatus = await issuedBookService.updateIssuedBook(issuedBookId,{isReturned:true, renewDate:null})
+      
+
+      const user = await userService.findUserByProperty(findModel(userRole),{_id:userId})
+      const {data:{bookId}} = await issuedBookService.findIssuedBookByProperty({_id:issuedBookId})
+
+      const {data:{bookName}} = await bookService.findBookByProperty({_id:bookId})
+
+      const notificationPayload = {
+        message: `${
+          user.studentName || user.teacherName
+        } your  ${
+          bookName
+        } book returned successfully`,
+        sender: {
+          role: req.user.userRole,
+          userId: req.user._id,
+          userName: req.user.userName,
+        },
+        reciever: {
+          role: user.userRole,
+          userId: user._id,
+          userName: user.studentName || user.teacherName || user.name,
+        },
+      };
+
+      const notification = await notificationService.createNotification(notificationPayload)
+      res.status(200).json({
+        message:notificationPayload.message,
+        returnStatus: !updateReturnStatus.error,
+        notificationSent:!notification.error
+      })
+    } catch (e) {
+      console.log("acceptReturnRequest-libraryAdminController: ", e)
+      res.status(e.message.status || 500).json({
+        errors:{
+          libraryAdmin: {
+            msg:e.message.txt || e.message
+          }
+        }
+      })
     }
   }
 }
