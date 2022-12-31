@@ -1,5 +1,6 @@
 const LibraryAdmin = require("../../models/lAdmin")
 const IssuedBook = require("../../models/issuedBook")
+const Fine = require("../../models/fine")
 const createError = require("http-errors")
 
 
@@ -52,6 +53,25 @@ class LibraryAdminService {
             }
         } catch (e) {
             console.log(e)
+            throw createError(e.message)
+        }
+    }
+
+    async findUserFine(query){
+        try {
+            const userFine =await Fine.find(query) 
+            if(userFine.length=== 0){
+                return {
+                    error:true,
+                    message:"You don't have any fine"
+                }
+            }
+            return {
+                error:false,
+                data:userFine
+            }
+        } catch (e) {
+            console.log("findUserFine-libAdminService: ", e)
             throw createError(e.message)
         }
     }
