@@ -27,7 +27,7 @@ class OtpService {
       const message = () => {
         return (
           `Dear User, \n\n` +
-          "OTP for forgating password is : \n\n" +
+          "OTP for forgating password in Library Management System is : \n\n" +
           `${otp}\n\n` +
           "This is a auto-generated email. Please do not reply to this email.\n\n" +
           "Regards\n" +
