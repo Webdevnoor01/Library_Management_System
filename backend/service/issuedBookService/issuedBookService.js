@@ -3,7 +3,6 @@ const createError = require("http-errors");
 
 class IssudBookService {
   async createIssueBook(payload) {
-    console.log(payload);
     try {
       const { bookId, userId, whoIssued, renewDate } = payload;
 
@@ -51,7 +50,27 @@ class IssudBookService {
       throw createError(e.message);
     }
   }
-  
+
+  async updateIssuedBook(userId, payload) {
+    try {
+      const updateRenewDate = await IssuedBook.findByIdAndUpdate(userId,payload)
+      if(!updateRenewDate){
+        return {
+          error:true,
+          message:updateRenewDate
+        }
+      }
+
+      return {
+        error:false,
+        data:updateRenewDate
+      }
+    } catch (e) {
+      console.log("updateRenewData-issuedBookSercice: ", e)
+      throw createError(e.message)
+    }
+  }
+
 }
 
 module.exports = new IssudBookService();
