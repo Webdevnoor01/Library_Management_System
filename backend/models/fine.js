@@ -8,16 +8,15 @@ const fineSchema = Schema(
     },
     paidAmount: {
       type: Number,
+      default:0
     },
-    user: {
-      student: {
-        type: Types.ObjectId,
-        ref: "Student",
-      },
-      teachaer: {
-        type: Types.ObjectId,
-        ref: "Teacher",
-      },
+    bookId: {
+      type: Types.ObjectId,
+      required: true,
+    },
+    userId: {
+      type: Types.ObjectId,
+      required: true,
     },
   },
   {
