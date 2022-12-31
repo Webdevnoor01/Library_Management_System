@@ -116,8 +116,7 @@ class PasswordController {
         })
       }
       res.status(200).json({
-        hashOtp:`${hashOtp}.${tte}`,
-        otp
+        hashOtp:`${hashOtp}.${tte}`
       })
 
     } catch (e) {
@@ -144,7 +143,6 @@ class PasswordController {
           }
         })
       }
-      console.log(req.headers)
       const [hash, expire] = hashedOtp.split(".")
       const data = `${email}.${otp}.${expire}`
 
@@ -161,7 +159,6 @@ class PasswordController {
           }
         })
       }
-      res.setHeader("otp", true)
       if(newPassword !== conformNewPassword){
         throw createError({
           message:{
