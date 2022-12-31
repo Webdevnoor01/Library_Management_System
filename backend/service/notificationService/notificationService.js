@@ -42,6 +42,7 @@ class NotificationService {
     async findNotificationByProperty(query){
         try {
             const notification = await Notification.find(query,"message createdAt")
+            console.log("notification service: ", notification)
             if(!notification.length >0 ){
                 return {
                     error:true,
