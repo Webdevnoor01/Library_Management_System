@@ -1,5 +1,6 @@
 const createError = require("http-errors");
-const Books = require("../../models/books")
+const Books = require("../../models/books");
+const IssuedBooks = require("../../models/issuedBook");
 
 class UserService {
   async createNewUser(model, payload) {
@@ -11,11 +12,13 @@ class UserService {
     }
   }
 
-  async findUserByProperty(model, query, requiredFields=null) {
+  async findUserByProperty(model, query, requiredFields = null) {
     try {
-      if(query === undefined){
-        
-        return await model.find({}, "studentName email phone address requestedBookList libraryId ")
+      if (query === undefined) {
+        return await model.find(
+          {},
+          "studentName email phone address requestedBookList libraryId "
+        );
       }
       if (query._id) {
         const user = await model.findById(query._id, requiredFields);
@@ -37,7 +40,8 @@ class UserService {
       const requestedBooks = await model
         .findById(userId, "requestedBookList")
         .populate("requestedBookList");
-      if (!requestedBooks) {
+        console.log(requestedBooks.requestedBookList.length )
+      if (requestedBooks.requestedBookList.length === 0) {
         return {
           error: true,
           message: "You don't have any requested book",
@@ -52,24 +56,29 @@ class UserService {
       throw createError(e.message);
     }
   }
-  async findIssuedBooks(model, userId){
+
+  async findIssuedBooks(userId, isReturned) {
     try {
-      const issuedBooks = await model.findById(userId, "issuedBookList").populate("issuedBookList")
-      if(issuedBooks.length <=0){
+      const issuedBooks = await IssuedBooks.find({
+        userId: userId,
+        isReturned:isReturned
+      });
+      if (issuedBooks.length <= 0) {
         return {
-          error:true,
-          message:"You dont have any issued books"
-        }
+          error: true,
+          message: "You dont have any issued books",
+        };
       }
 
       return {
-        error:false,
-        data:issuedBooks.issuedBookList
-      }
+        error: false,
+        data: issuedBooks,
+      };
     } catch (e) {
-      throw createError(e.message)
+      throw createError(e.message);
     }
   }
+
   async updateUserRef(model, query, refField, payload) {
     try {
       let user;
@@ -89,14 +98,14 @@ class UserService {
           },
         });
       }
-
-      if (!user) return {
-        error:true,
-        message:`error to update ${refField}`
-      };
+      if (!user)
+        return {
+          error: true,
+          message: `error to update ${refField}`,
+        };
       return {
-        error:false,
-        data:user
+        error: false,
+        data: user,
       };
     } catch (e) {
       console.log(e);
@@ -104,42 +113,42 @@ class UserService {
     }
   }
 
-
-  async deleteUserRef(model,query,fieldName, idBeDeleted){
+  async deleteUserRef(model, query, fieldName, idBeDeleted) {
     try {
-      
-      const deleteUserRef = await model.updateOne(query,{$pull:{[fieldName]:idBeDeleted}})
-      if(!deleteUserRef){
+      const deleteUserRef = await model.updateOne(query, {
+        $pull: { [fieldName]: idBeDeleted },
+      });
+      if (!deleteUserRef) {
         return {
-          error:true,
-          message:`error to delete ${refField}`
-        }
+          error: true,
+          message: `error to delete ${refField}`,
+        };
       }
 
       return {
-        error:false,
-        data:deleteUserRef
-      }
+        error: false,
+        data: deleteUserRef,
+      };
     } catch (e) {
-      throw createError(e.message)
+      throw createError(e.message);
     }
   }
 
-  async changePassword(model, userId, payload){
+  async changePassword(model, userId, payload) {
     try {
-      const user = await model.findByIdAndUpdate(userId,{...payload})
-      if(!user){
+      const user = await model.findByIdAndUpdate(userId, { ...payload });
+      if (!user) {
         return {
-          error:true,
-          message:user
-        }
+          error: true,
+          message: user,
+        };
       }
       return {
-        error:false,
-        data:user
-      }
+        error: false,
+        data: user,
+      };
     } catch (e) {
-      throw createError(e.message)
+      throw createError(e.message);
     }
   }
 }
