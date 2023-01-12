@@ -90,4 +90,18 @@ router.post(
   adminAuthorization.authorized,
   libraryAdminController.acceptReturnBookRequest
 );
+
+router.get(
+  "/find-renew-request/:userId",
+  authenticateMiddleware.authenticate,
+  adminAuthorization.authorized,
+  libraryAdminController.findRenewRequest
+);
+
+router.post(
+  "/accept-renew-request/:userId",
+  authenticateMiddleware.authenticate,
+  adminAuthorization.authorized,
+  libraryAdminController.acceptRenewRequest,
+);
 module.exports = router;
