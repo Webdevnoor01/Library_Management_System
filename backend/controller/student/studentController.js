@@ -6,6 +6,7 @@ const createError = require("http-errors");
 const fineService = require("../../service/fineService/fineService");
 const issuedBookService = require("../../service/issuedBookService/issuedBookService");
 const returnBookService = require("../../service/returnBookService/returnBookService");
+const renewBookService = require("../../service/renewBookService/renewBookService");
 
 class StudentController {
   async findRequestedBook(req, res) {
@@ -339,6 +340,61 @@ class StudentController {
           },
         },
       });
+    }
+  }
+
+  async renewBook(req, res){
+    const {userId} = req.params
+    const {issuedBookId } = req.body
+    try {
+
+      if(!userId || !issuedBookId) {
+        throw createError({
+          message:{
+            status:400,
+          txt:"Please provide userId and issuedBookIdP"
+          }
+        })
+      }
+      const findRenewBookPayload = {
+        userId,
+        issuedBookId
+      }
+      const isRenewRequest = await renewBookService.findRenewRequestByUserId(findRenewBookPayload)
+      if(!isRenewRequest.error){
+        throw createError({
+          message:{
+            status:400,
+            txt:"You already send request for renew this book"
+          }
+        })
+      }
+
+      const renewRequestBookPayload = {
+        userId,
+        issuedBookId
+      }
+      const newRenewRequest = await renewBookService.createNewRenewRequest(renewRequestBookPayload)
+      if(newRenewRequest.error){
+        throw createError({
+          message:{
+            txt:newRenewRequest.message
+          }
+        })
+      }
+
+      res.status(200).json({
+        message:"Successfully send request for renew this book",
+        data:newRenewRequest.data
+      })
+    } catch (e) {
+      res.status(e.message.status || 500).json({
+        errors:{
+          student:{
+            msg:e.message.txt || e.message
+          }
+        }
+      })
     }
   }
 }
