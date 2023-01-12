@@ -12,11 +12,12 @@ const notificationService = require("../../service/notificationService/notificat
 const libraryStaffService = require("../../service/libraryStaffService/libraryStaffService");
 
 const findModel = require("../../util/findModel");
-const { renewDate } = require("../../util/generateRenewData");
+const { renewDate:generateRenewDate } = require("../../util/generateRenewData");
 
 const UserDto = require("../../userDTO/userDto");
 const fineService = require("../../service/fineService/fineService");
 const returnBookService = require("../../service/returnBookService/returnBookService");
+const renewBookService = require("../../service/renewBookService/renewBookService");
 
 class LibraryAdminController {
   async createAdmin(req, res) {
@@ -66,10 +67,10 @@ class LibraryAdminController {
     const {userId} = req.params
     try {
       const requestedBookPayload = {
-        userId
+        userId:userId
       }
       const requestedBooks = await requestedBookService.findAllRequestedBook(requestedBookPayload)
-      if(!requestedBooks.error){
+      if(requestedBooks.error){
         throw createError({
           message:{
             txt:requestedBooks.message
@@ -104,7 +105,7 @@ class LibraryAdminController {
 
       const isRequestedBook =
         await requestedBookService.findRequestedBookByProperty({
-          _id: requestedBookId,
+          _id: requestedBookId
         });
       if (isRequestedBook.error) {
         throw createError({
@@ -126,6 +127,7 @@ class LibraryAdminController {
       const isIssued = await issuedBookService.findIssuedBookByProperty({
         userId: userId,
         bookId: bookId,
+        isReturned:false
       });
       if (!isIssued.error) {
         throw createError({
@@ -139,7 +141,7 @@ class LibraryAdminController {
         bookId: bookId,
         bookName: isBook.data.bookName,
         whoIssued: req.user.userName,
-        renewDate: `${renewDate()}`,
+        renewDate: `${generateRenewDate()}`,
       };
       const user = await userService.findUserByProperty(
         findModel(requestedUserRole),
@@ -446,7 +448,7 @@ class LibraryAdminController {
           bookId,
         });
         const updateIssuedBookPayload = {
-          renewDate: renewDate(15),
+          renewDate: generateRenewDate(15),
         };
         const issuedBook = await issuedBookService.updateIssuedBook(
           isIssuedBook.data._id,
@@ -582,6 +584,113 @@ class LibraryAdminController {
         errors:{
           libraryAdmin: {
             msg:e.message.txt || e.message
+          }
+        }
+      })
+    }
+  }
+
+  async findRenewRequest(req, res){
+    const {userId} = req.params
+    try {
+      const renewRequests = await renewBookService.findRenewRequests({userId})
+      if(renewRequests.error){
+        throw createError({
+          message:{
+            txt:renewRequests.message
+          }
+        })
+      }
+      res.status(200).json({
+        message:`${renewRequests.data.length} renew book request found`,
+        renewRequests:renewRequests.data
+      })
+    } catch (e) {
+      console.log("libraryAdminController: ", e)
+      res.status(e.message.status || 500).json({
+        errors:{
+          libraryAdmin:{
+            txt:e.message.txt || e.message
+          }
+        }
+      })
+    }
+  }
+
+  async acceptRenewRequest(req, res){
+    const {userId} = req.params
+    const {issuedBookId, userRole} = req.body
+    try {
+      if(!issuedBookId || !userId || !userRole){
+        throw createError({
+          message:{
+            status:400,
+            txt:"Please provide userId, issuedBookId and userRole"
+          }
+        })
+      }
+      const isRenewRequest = await renewBookService.findRenewRequestByUserId({userId, issuedBookId})
+      if(isRenewRequest.error){
+        throw createError({
+          message:{
+            txt:isRenewRequest.message
+          }
+        })
+      }
+
+      const isIssuedBook = await issuedBookService.findIssuedBookByProperty({_id:issuedBookId})
+      if(isIssuedBook.error){
+        throw createError({
+          message:{
+            txt:isIssuedBook.message
+          }
+        })
+      }
+       isIssuedBook.data.renewDate = generateRenewDate(15)
+       await isIssuedBook.data.save()
+      const user = await userService.findUserByProperty(findModel(userRole),  
+      {_id:userId})
+      const book = await bookService.findBookByProperty({_id:isIssuedBook.data.bookId})
+
+      const notificationPayload = {
+        message: `${
+          user.studentName || user.teacherName
+        } your renew request has been accepted for this book ${
+          book.data.bookName
+        }.Now your next renew date is ${isIssuedBook.data.renewDate} `,
+        sender: {
+          role: req.user.userRole,
+          userId: req.user._id,
+          userName: req.user.userName,
+        },
+        reciever: {
+          role: user.userRole,
+          userId: user._id,
+          userName: user.studentName || user.teacherName || user.name,
+        },
+      };
+      const newNotification = await notificationService.createNotification(
+        notificationPayload
+      );
+      if (newNotification.error) {
+        console.log(newNotification.message);
+      }
+      
+      const deleteRenewRequest = await renewBookService.deleteRenewRequest({
+        userId,
+        issuedBookId
+      })
+
+      res.status(200).json({
+        message:notificationPayload.message,
+        renewedBook: isIssuedBook.data,
+        renewBookDelete:!deleteRenewRequest.error
+      })
+    } catch (e) {
+      res.status(e.message.status || 500).json({
+        errors:{
+          libraryAdmin:{
+            msg:e.message.txt
           }
         }
       })
