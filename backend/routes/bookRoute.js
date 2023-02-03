@@ -18,7 +18,8 @@ router.post(
 
 router.get("/find", bookController.findAllBooks);
 router.get("/findBy", bookController.findBookByProperty);
-router.patch("/update/:id", bookController.updateBook);
+router.patch("/update/:id", authenticateMiddlware.authenticate,
+bookCUDauthorization.authorized, bookController.updateBook);
 router.patch(
   "/update/img/:id",
   imageUploader.uploadImage("booksImg"),
