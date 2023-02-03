@@ -1,7 +1,8 @@
 const router = require("express").Router();
 const libraryCardValidation = require("../middleware/libraryCard/libraryCard");
 const libraryCardController = require("../controller/libraryCard/libraryCardController");
-const adminAuthorization = require("../middleware/authorization/adminAuthorization")
+const authenticateMiddleware = require("../middleware/authenticate/authenticate");
+const adminAuthorization = require("../middleware/authorization/adminAuthorization");
 router.post(
   "/create",
   adminAuthorization.authorized,
@@ -10,9 +11,21 @@ router.post(
   libraryCardController.create
 );
 
-router.get("/find", libraryCardController.findCard);
-router.get("/find/:libraryId", libraryCardController.findCardByLid);
+router.get(
+  "/find",
+  authenticateMiddleware.authenticate,
+  libraryCardController.findCard
+);
+router.get(
+  "/find/:libraryId",
+  authenticateMiddleware.authenticate,
+  libraryCardController.findCardByLid
+);
 
-router.patch("/update/:libraryId",adminAuthorization.authorized, libraryCardController.uadateCard);
+router.patch(
+  "/update/:libraryId",
+  adminAuthorization.authorized,
+  libraryCardController.uadateCard
+);
 
 module.exports = router;
