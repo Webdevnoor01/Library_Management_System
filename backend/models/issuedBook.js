@@ -21,13 +21,12 @@ const issuedBookSchema = Schema(
     },
     renewDate: {
       type: Date,
-      required: true,
       default:Date.now()
     },
     isReturned: {
       type: Boolean,
       default: false,
-    },
+    }
   },
   {
     timestamps: true,
