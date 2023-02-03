@@ -4,23 +4,18 @@ const fs = require("fs");
 const profileService = require("../../service/profileService/profileService");
 const userService = require("../../service/userService/userService");
 const findModel = require("../../util/findModel");
+const customeError = require("../../util/throwError");
 class ProfileController {
   async update(req, res) {
     const { userRole, _id: userId } = req.user;
     let payload;
     try {
       if (req.url !== `/update/avatar/${userId}`) {
-        if (Object.keys(req.body).length === 0) {
-          throw createError({
-            message: "Please choose at least on filed to update",
-          });
-        }
-      }else{
-        if(req.files.length === 0){
-            throw createError({
-                message: "Please choose an image",
-              });
-        }
+        if (Object.keys(req.body).length === 0)
+          throw customeError("Please choose at least on filed to update", 400);
+      } else {
+        if (req.files.length === 0)
+          throw customeError("Please choose an image");
       }
       if (
         userRole === "Assistant" ||
@@ -35,23 +30,13 @@ class ProfileController {
           req.body.issuedBookList ||
           req.body.requestedBookList ||
           req.body.fine
-        ) {
-          throw createError({
-            message: "Something went worng",
-          });
-        }
+        )
+          throw customeError("Something went worng", 403);
       }
       payload = req.files ? { avatar: req.files[0].path } : req.body;
-      if (req.body.password) {
-        throw createError("You can't update password");
-      }
+      if (req.body.password) throw customeError("You can't update password");
 
-      if (req.body._id) {
-        throw createError({
-          status: 400,
-          message: "You can't update _id",
-        });
-      }
+      if (req.body._id) throw customeError("You can't update _id", 403);
 
       const user = await userService.findUserByProperty(
         findModel(req.user.userRole),
@@ -73,11 +58,7 @@ class ProfileController {
         userId
       );
 
-      if (profile.error) {
-        throw createError({
-          message: profile.message,
-        });
-      }
+      if (profile.error) throw customeError(profile.message);
 
       res.status(201).json({
         message: "Profile updated successfully.",
@@ -93,10 +74,10 @@ class ProfileController {
           }
         });
       }
-      res.status(e.status || 500).json({
+      res.status(e.message.status).json({
         errors: {
           profile: {
-            msg: e.message,
+            msg: e.message.txt || e.message,
           },
         },
       });

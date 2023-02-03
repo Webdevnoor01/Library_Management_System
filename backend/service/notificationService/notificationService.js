@@ -7,26 +7,26 @@ const Notification = require("../../models/notification")
 
 class NotificationService {
 
-   async createNotification(payload){
+    async createNotification(payload) {
         try {
-            if(!(payload.message && payload.reciever && payload.sender)){
+            if (!(payload.message && payload.reciever && payload.sender)) {
                 return {
-                    error:true,
-                    message:"Please type valid message reciever sender"
+                    error: true,
+                    message: "Please type valid message reciever sender"
                 }
             }
 
             const notification = await Notification.create(payload)
-            if(!notification){
+            if (!notification) {
                 return {
-                    error:true,
-                    message:"error to creating notification"
+                    error: true,
+                    message: "error to creating notification"
                 }
             }
 
             return {
-                error:false,
-                data:notification
+                error: false,
+                data: notification
             }
         } catch (e) {
             throw createError(e.message)
@@ -39,20 +39,19 @@ class NotificationService {
      *  {userId, role, userName}
      * }
      */
-    async findNotificationByProperty(query){
+    async findNotificationByProperty(query) {
         try {
-            const notification = await Notification.find(query,"message createdAt")
-            console.log("notification service: ", notification)
-            if(!notification.length >0 ){
+            const notification = await Notification.find(query, "message createdAt")
+            if (!notification.length > 0) {
                 return {
-                    error:true,
-                    message:"Empty notification"
+                    error: true,
+                    message: "Empty notification"
                 }
             }
 
             return {
-                error:false,
-                data:notification
+                error: false,
+                data: notification
             }
         } catch (e) {
             throw createError(e.message)

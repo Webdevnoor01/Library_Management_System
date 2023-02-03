@@ -33,8 +33,13 @@ class IssudBookService {
 
   async findIssuedBookByProperty(query) {
     try {
-      const issuedBook = await IssuedBook.findOne(query);
+      let issuedBook
+      if(query._id){
+        issuedBook = await IssuedBook.findById(query._id)
+      }else{
 
+        issuedBook = await IssuedBook.findOne(query);
+      }
       if (!issuedBook) {
         return {
           error: true,

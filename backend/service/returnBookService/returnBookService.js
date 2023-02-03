@@ -37,7 +37,7 @@ class ReturnBookService {
         }
     }
 
-    async deleteReturnBook(query){
+    async deleteReturnBookRequest(query){
         try {
             const deleteRequest = await ReturnRequest.deleteOne(query)
             if(!deleteRequest) {
