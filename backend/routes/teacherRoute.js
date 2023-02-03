@@ -40,4 +40,10 @@ router.post(
   teacherController.returnBook
 );
 
+router.post(
+  "/renew-book/:userId",
+  requestedBookAuthorization.authorized,
+  teacherController.renewBook
+);
+
 module.exports = router;
