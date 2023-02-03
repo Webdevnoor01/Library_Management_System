@@ -1,25 +1,25 @@
-
 const tokenService = require("../../service/token/tokenService")
-class Authenticate{
+const customError = require("../../util/throwError")
+class Authenticate {
 
-    async authenticate(req, res, next){
+    async authenticate(req, res, next) {
         try {
-            const {accessToken} = req.cookies
-            if(!accessToken){
-                throw new Error()
-            }
+            const { accessToken } = req.cookies
+            if (!accessToken) throw customError("Authentication failed", 401)
 
             const userData = await tokenService.verifyAccessToken(accessToken)
-            if(!userData){
-                throw new Error()
-            }
+            if (!userData) throw customError("Authentication failed", 401)
             req.user = userData
             next()
-            
-        } catch (error) {  
-            console.log(error) 
-            res.status(401).json({
-                error:"Authentication failed"
+
+        } catch (e) {
+            console.log(e)
+            res.status(e.message.status).json({
+                errors: {
+                    authentication: {
+                        msg: e.message.txt
+                    }
+                }
             })
         }
 
