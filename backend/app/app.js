@@ -7,19 +7,19 @@ const router = require("./route")
 
 
 const app = express()
-app.use(bodyParser.json())
-app.use(express.urlencoded({extended:true }))
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(cookieParser())
 app.use(router)
 
 
-app.use((err, _req, res, _next)=>{
-    if(err){
+app.use((err, _req, res, _next) => {
+    if (err) {
         res.status(err.status || 500).json({
-            errors:{
-                common:{
-                    msg:err.message
+            errors: {
+                common: {
+                    msg: err.message
                 }
             }
         })

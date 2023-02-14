@@ -45,6 +45,7 @@ class LibraryCardSearvice {
         const libraryCard = await LibraryCard.findOne({
             libraryId: libraryId,
         });
+        console.log(libraryCard)
         if (!libraryCard) {
             return {
                 error: true,
@@ -72,6 +73,24 @@ class LibraryCardSearvice {
             };
         } catch (e) {
             throw customError(e.message, `${e?.status}`)
+        }
+    }
+
+    async deleteLibrayCard(query) {
+        try {
+            const librayCard = await LibraryCard.deleteOne(query)
+            if (!librayCard) {
+                return {
+                    error: true,
+                    message: librayCard
+                }
+            }
+            return {
+                error: false,
+                data: librayCard
+            }
+        } catch (e) {
+            throw customError(e.message, e.status)
         }
     }
 }

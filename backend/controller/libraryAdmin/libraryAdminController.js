@@ -10,6 +10,7 @@ const requestedBookService = require("../../service/requestBookService/requestBo
 const bookService = require("../../service/bookService/bookService");
 const notificationService = require("../../service/notificationService/notificationService");
 const libraryStaffService = require("../../service/libraryStaffService/libraryStaffService");
+const libraryCardService = require("../../service/libraryCardService/index")
 
 const findModel = require("../../util/findModel");
 const {
@@ -406,14 +407,18 @@ class LibraryAdminController {
     }
 
     async acceptReturnBookRequest(req, res) {
-        const { issuedBookId, userRole } = req.body;
+        const { issuedBookId, userRole, libraryId } = req.body;
         const { userId } = req.params;
         try {
-            if (!issuedBookId || !userId || !userRole)
+            if (!issuedBookId || !userId || !userRole || !libraryId)
                 throw customeError(
-                    "uesrId, userRole and issuedBookId is required.",
+                    "uesrId, userRole, issuedBookId and libraryId are required.",
                     400
                 );
+            const { data: libraryCard, error: libraryCardErr } = await libraryCardService.findCardById(libraryId)
+            if (libraryCard.bookLimit === 3 && userRole === libraryCard.userRole) throw customeError("Your book limit reached out")
+            if (libraryCard.bookLimit === libraryCard.bookCount && userRole === libraryCard.userRole) throw customeError("YYour book limit reached out")
+
             const isReturnBookRequest = await returnBookService.findReturnRequest({
                 issuedBookId,
             });
@@ -470,9 +475,15 @@ class LibraryAdminController {
             const notification = await notificationService.createNotification(
                 notificationPayload
             );
+
+
+            const { data: updateLibraryCard, error: updateLibraryCardErr } = await libraryCardService.updateLibraryCard(libraryId, {
+                bookCount: (libraryCard.bookCount + 1)
+            })
             res.status(200).json({
                 message: notificationPayload.message,
                 notificationSent: !notification.error,
+                updateBookCount: !updateLibraryCardErr
             });
         } catch (e) {
             console.log("acceptReturnRequest-libraryAdminController: ", e);

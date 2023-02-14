@@ -1,27 +1,44 @@
 const libraryCardSearvice = require("../../service/libraryCardService/index");
+const userService = require("../../service/userService/userService");
 const customeError = require("../../util/throwError");
 
 class LibraryCard {
-    async create(req, res, _next) {
-        const { userName, depertment, issueDate, libraryId, bookLimit } = req.body;
+    async create(req, res) {
+        const {
+            userName,
+            depertment,
+            issueDate,
+            libraryId,
+            bookLimit,
+        } = req.body;
+
         try {
             const isLibraryCard = await libraryCardSearvice.findCardById(libraryId);
-            if (isLibraryCard.error)
+            console.log("lib: ", isLibraryCard);
+            if (!isLibraryCard.error)
                 throw customeError("You already create this library card", 400);
-            const libraryCard = await libraryCardSearvice.createCard({
+
+            const libraryCardPayload = {
                 userName,
                 depertment,
                 issueDate,
                 libraryId,
-                bookLimit,
-            });
+                bookLimit
+            };
+            console.log("payload: ", libraryCardPayload);
+            const libraryCard = await libraryCardSearvice.createCard(
+                libraryCardPayload
+            );
 
             if (libraryCard.error) throw customeError("Something went wrong");
-            res
-                .status(200)
-                .json({ messsage: "Library Card created successfully", libraryCard });
+
+            res.status(200).json({
+                messsage: "Library Card created successfully",
+                libraryCard: libraryCard.data,
+            });
         } catch (e) {
-            res.status(e.message.status).json({
+            console.log("libraryCardController-createLibraryCard: ", e.message);
+            res.status(e.message.status || 500).json({
                 errors: {
                     libraryCard: {
                         msg: e.message.txt || e.message,
@@ -31,13 +48,14 @@ class LibraryCard {
         }
     }
 
-    async findCard(_req, res, _next) {
+    async findCard(_req, res) {
         const libraryCards = await libraryCardSearvice.findCard();
         try {
             if (libraryCards.error) throw customeError(libraryCards.message);
 
             res.status(200).json({
-                message: `${libraryCards.length} library cards found`,
+                message: `${libraryCards.data.length} library cards found`,
+                libraryCards: libraryCards.data,
             });
         } catch (e) {
             console.log(e);
@@ -51,7 +69,7 @@ class LibraryCard {
         }
     }
 
-    async findCardByLid(req, res, _next) {
+    async findCardByLid(req, res) {
         const { libraryId } = req.params;
         try {
             const libraryCard = await libraryCardSearvice.findCardById(libraryId);
@@ -91,6 +109,25 @@ class LibraryCard {
                 error: {
                     libraryCard: {
                         msg: e.message.txt || e.message,
+                    },
+                },
+            });
+        }
+    }
+
+    async deleteLibraryCardById(req, res) {
+        const { libraryId, userRole } = req.body;
+        try {
+            if (!libraryId || !userRole)
+                throw customeError("libraryId and userRole is required");
+
+            const user = await userService.find;
+        } catch (e) {
+            console.log("libraryCardController: ", e);
+            res.status(e.message.status).json({
+                errors: {
+                    libraryCard: {
+                        msg: e.messsage.txt || e.message,
                     },
                 },
             });
