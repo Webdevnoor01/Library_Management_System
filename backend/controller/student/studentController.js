@@ -1,12 +1,12 @@
 const userService = require("../../service/userService/userService");
 const requestBookService = require("../../service/requestBookService/requestBookService");
 const notificationService = require("../../service/notificationService/notificationService");
-const findModel = require("../../util/findModel");
-const createError = require("http-errors");
 const fineService = require("../../service/fineService/fineService");
 const issuedBookService = require("../../service/issuedBookService/issuedBookService");
 const returnBookService = require("../../service/returnBookService/returnBookService");
 const renewBookService = require("../../service/renewBookService/renewBookService");
+const libraryCardService = require("../../service/libraryCardService/index")
+const findModel = require("../../util/findModel");
 const customError = require("../../util/throwError");
 
 class StudentController {
@@ -107,7 +107,7 @@ class StudentController {
     async deleteRequestedBook(req, res) {
         const { userId, fieldName, requestedBookId } = req.query;
         try {
-            if (!(userId && fieldName && requestedBookId))
+            if (!userId || !fieldName || !requestedBookId)
                 throw customError(
                     "Please provide userId, fieldName, and requestedBookId"
                 );
@@ -182,12 +182,15 @@ class StudentController {
     }
 
     async returnBook(req, res) {
-        const { issuedBookId } = req.body;
+        const { issuedBookId, libraryId } = req.body;
         const { userRole, _id: userId } = req.user;
         try {
-            if (!issuedBookId) {
-                throw customError("issuedBookId is required", 400);
-            }
+            if (!userId || !issuedBookId || !libraryId || !userRole)
+                throw customError("Please provide userId, libraryId, issuedBookId, and userRole", 400);
+
+            const { data: userData, error: userError } = await userService.findUserByProperty(findModel(userRole), { _id: userId })
+            console.log("userData: ", userData)
+            if (userData.libraryId !== libraryId) throw customError("please provide valid libraryId", 400)
 
             const returnRequestQuery = {
                 issuedBookId,
@@ -256,6 +259,7 @@ class StudentController {
             const returnRequestPaylad = {
                 userId,
                 issuedBookId,
+                libraryId
             };
             const returnRequest = await returnBookService.createNewReturnRequest(
                 returnRequestPaylad
@@ -280,10 +284,14 @@ class StudentController {
 
     async renewBook(req, res) {
         const { userId } = req.params;
-        const { issuedBookId } = req.body;
+        const { issuedBookId, libraryId } = req.body;
+        const { userRole } = req.user
         try {
-            if (!userId || !issuedBookId)
-                throw customError("Please provide userId and issuedBookId", 400);
+            if (!userId || !issuedBookId || !libraryId || !userRole)
+                throw customError("Please provide userId, libraryId, issuedBookId, and userRole", 400);
+
+            const { data: userData, error: userError } = await userService.findUserByProperty(findModel(userRole), { _id: userId })
+            if (userData.libraryId !== libraryId) throw customError("please provide valid libraryId", 400)
 
             const issuedBook = await issuedBookService.findIssuedBookByProperty({
                 _id: issuedBookId,
@@ -348,6 +356,7 @@ class StudentController {
             const renewRequestBookPayload = {
                 userId,
                 issuedBookId,
+                libraryId
             };
             const newRenewRequest = await renewBookService.createNewRenewRequest(
                 renewRequestBookPayload

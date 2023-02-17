@@ -13,16 +13,15 @@ const customError = require("../../util/throwError");
 
 class BookRequest {
     async newBookRequest(req, res) {
-        const { bookId, userId } = req.query;
+        const { bookId, userId, libraryId } = req.query;
         try {
             const payload = {
                 bookId,
                 userId,
+                libraryId
             };
-            // console.log("payload: ", payload)
             const isRequestedBook =
                 await requestBookService.findRequestedBookByProperty(payload);
-            // console.log("isRequestedBook", isRequestedBook)
             if (!isRequestedBook.error)
                 throw customError("You already send request for this book", 400);
 
@@ -98,11 +97,11 @@ class BookRequest {
     }
 
     async findUserRequestedBook(req, res) {
-        const { userId } = req.params;
+        const { libraryId } = req.params;
         try {
             const requestedBooks = await userService.findRequestedBook(
                 findModel(req.userRole),
-                userId
+                libraryId
             );
             if (requestedBooks.error) throw customError(requestedBooks.message, 404);
 

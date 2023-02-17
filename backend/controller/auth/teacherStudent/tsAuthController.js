@@ -125,8 +125,8 @@ class AuthController {
             }
             const model = findModel(role);
             const query = userId ? { userId: userId } : { email: email };
-            const user = await userService.findUserByProperty(model, query);
-            if (!user) {
+            const { data: user, error: userError } = await userService.findUserByProperty(model, query);
+            if (userError) {
                 return res.status(400).json({
                     errors: {
                         login: {

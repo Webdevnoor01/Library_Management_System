@@ -6,43 +6,43 @@ const authenticateMiddleware = require("../middleware/authenticate/authenticate"
 
 router.get("/find", studentController.findStudents);
 router.get(
-  "/issue_books/:userId",
-  requestedBookAuthorization.authorized,
-  studentController.findRequestedBook
+    "/issue_books/:userId",
+    requestedBookAuthorization.authorized,
+    studentController.findRequestedBook
 );
 router.get(
-  "/find/issued_book/:userId",
-  authenticateMiddleware.authenticate,
-  requestedBookAuthorization.authorized,
-  studentController.findIssuedBooks
+    "/find/issued_book/:userId",
+    authenticateMiddleware.authenticate,
+    requestedBookAuthorization.authorized,
+    studentController.findIssuedBooks
 );
 router.get(
-  "/find/returned-books/:userId",
-  authenticateMiddleware.authenticate,
-  requestedBookAuthorization.authorized,
-  studentController.findReturnedBook
+    "/find/returned-books/:userId",
+    authenticateMiddleware.authenticate,
+    requestedBookAuthorization.authorized,
+    studentController.findReturnedBook
 );
 router.get(
-  "/notifications",
-  authenticateMiddleware.authenticate,
-  studentAuthorization.authorized,
-  studentController.getNotification
+    "/notifications",
+    authenticateMiddleware.authenticate,
+    studentAuthorization.authorized,
+    studentController.getNotification
 );
 router.delete(
-  "/reject_issue_book/:userId",
-  requestedBookAuthorization.authorized,
-  studentController.deleteRequestedBook
+    "/reject_issue_book",
+    requestedBookAuthorization.authorized,
+    studentController.deleteRequestedBook
 );
 
 router.post(
-  "/return-book/:userId",
-  requestedBookAuthorization.authorized,
-  studentController.returnBook
+    "/return-book/:userId",
+    requestedBookAuthorization.authorized,
+    studentController.returnBook
 );
 
 router.post(
-  "/renew-book/:userId",
-  requestedBookAuthorization.authorized,
-  studentController.renewBook
+    "/renew-book/:userId",
+    requestedBookAuthorization.authorized,
+    studentController.renewBook
 );
 module.exports = router;

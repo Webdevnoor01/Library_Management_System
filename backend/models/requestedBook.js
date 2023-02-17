@@ -1,6 +1,6 @@
 const { Schema, model, Types } = require("mongoose");
 
-const requestedBookSchema = Schema({
+const requestedBookSchema = new Schema({
     userId: {
         type: Types.ObjectId,
         references: [
@@ -13,9 +13,13 @@ const requestedBookSchema = Schema({
         type: Types.ObjectId,
         required: true,
         ref: "Book",
+    },
+    libraryId: {
+        type: String,
+        required: true
     }
 });
 
-const RequestedBook = new model("RequestedBook", requestedBookSchema);
+const RequestedBook = model("RequestedBook", requestedBookSchema);
 
 module.exports = RequestedBook;

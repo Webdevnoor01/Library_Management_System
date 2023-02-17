@@ -1,7 +1,7 @@
-const { Schema, model, Types } = require("mongoose");
+const { Schema, model } = require("mongoose");
 const { renewDate } = require("../util/generateRenewData");
 
-const libraryCardSchema = Schema({
+const libraryCardSchema = new Schema({
     userName: {
         type: String,
         required: true,
@@ -26,10 +26,12 @@ const libraryCardSchema = Schema({
         type: Number,
         default: 0,
     },
+    userRole: {
+        type: String,
+        required: true
+    }
 }, {
     timestamps: true,
 });
 
-const LibraryCard = new model("LibraryCard", libraryCardSchema);
-
-module.exports = LibraryCard;
+module.exports = model("LibraryCard", libraryCardSchema);

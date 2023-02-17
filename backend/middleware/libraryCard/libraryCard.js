@@ -5,9 +5,9 @@ class LibraryCard {
         const libraryCardValidator = [
             check("userName")
             .isString()
-            .withMessage("User name must be a string")
+            .withMessage("userName must be a string")
             .isLength({ min: 4, max: 30 })
-            .withMessage("Minimum length of your name is 4 letter")
+            .withMessage("Minimum length of your name is 4 charecter")
             .isAlpha("en-US", { ignore: " -" })
             .withMessage("Name must not contain anything other than alphabet"),
 
@@ -34,6 +34,13 @@ class LibraryCard {
             .withMessage("bookLimit must be a number.")
             .isLength({ max: "1" })
             .withMessage("your maximum book limit is one digit number like 1-9."),
+
+            check("userRole")
+            .isString()
+            .withMessage("userRole must be a string")
+            .isLength({ min: 4, max: 7 })
+            .withMessage("maximum length of userRole is 7 charecter")
+
         ];
 
         return libraryCardValidator;

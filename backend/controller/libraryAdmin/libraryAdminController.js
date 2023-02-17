@@ -62,10 +62,10 @@ class LibraryAdminController {
         }
     }
     async findUserRequestedBook(req, res) {
-        const { userId } = req.params;
+        const { libraryId } = req.params;
         try {
             const requestedBookPayload = {
-                userId: userId,
+                libraryId: libraryId,
             };
             const requestedBooks = await requestedBookService.findAllRequestedBook(
                 requestedBookPayload
@@ -87,10 +87,10 @@ class LibraryAdminController {
         }
     }
     async acceptRequestedBook(req, res) {
-        const { requestedBookId, requestedUserRole } = req.body;
+        const { requestedBookId, requestedUserRole, libraryId } = req.body;
 
         try {
-            if (!(requestedBookId && requestedUserRole))
+            if (!(requestedBookId && requestedUserRole && libraryId))
                 throw customeError("plese provide all required fields", 400);
 
             const isRequestedBook =
@@ -99,6 +99,7 @@ class LibraryAdminController {
                 });
             if (isRequestedBook.error)
                 throw customeError("You don't send requst for this book", 400);
+            if (isRequestedBook.data.libraryId !== libraryId) throw customeError("Please provide valid libraryId")
             const isBook = await bookService.findBookByProperty({
                 _id: `${isRequestedBook?.data?.bookId}`,
             });
@@ -117,6 +118,7 @@ class LibraryAdminController {
             const issuedBookPayload = {
                 userId: userId,
                 bookId: bookId,
+                libraryId,
                 bookName: isBook.data.bookName,
                 whoIssued: req.user.userName,
                 renewDate: `${generateRenewDate()}`,
@@ -384,10 +386,10 @@ class LibraryAdminController {
     }
 
     async findReturnRequest(req, res) {
-        const { userId } = req.params;
+        const { libraryId } = req.params;
         try {
             const returnRequest = await returnBookService.findReturnRequest({
-                userId,
+                libraryId,
             });
             if (returnRequest.error) throw customeError(returnRequest.message, 400);
             res.status(200).json({
@@ -407,17 +409,14 @@ class LibraryAdminController {
     }
 
     async acceptReturnBookRequest(req, res) {
-        const { issuedBookId, userRole, libraryId } = req.body;
-        const { userId } = req.params;
+        const { issuedBookId, userRole } = req.body;
+        const { libraryId } = req.params;
         try {
-            if (!issuedBookId || !userId || !userRole || !libraryId)
+            if (!issuedBookId || !userRole || !libraryId)
                 throw customeError(
-                    "uesrId, userRole, issuedBookId and libraryId are required.",
+                    " userRole, issuedBookId and libraryId are required.",
                     400
                 );
-            const { data: libraryCard, error: libraryCardErr } = await libraryCardService.findCardById(libraryId)
-            if (libraryCard.bookLimit === 3 && userRole === libraryCard.userRole) throw customeError("Your book limit reached out")
-            if (libraryCard.bookLimit === libraryCard.bookCount && userRole === libraryCard.userRole) throw customeError("YYour book limit reached out")
 
             const isReturnBookRequest = await returnBookService.findReturnRequest({
                 issuedBookId,
@@ -428,7 +427,8 @@ class LibraryAdminController {
             await issuedBookService.findIssuedBookByProperty({
                 _id: issuedBookId,
             });
-
+            console.log("bookData: ", bookData)
+            if (bookData.libraryId !== libraryId) throw customeError("Please type valid libraryId")
             if (!bookError) {
                 (bookData.isReturned = true), (bookData.renewData = null);
                 await bookData.save();
@@ -498,10 +498,10 @@ class LibraryAdminController {
     }
 
     async findRenewRequest(req, res) {
-        const { userId } = req.params;
+        const { libraryId } = req.params;
         try {
             const renewRequests = await renewBookService.findRenewRequests({
-                userId,
+                libraryId,
             });
             if (renewRequests.error) throw customeError(renewRequests.message, 404);
             res.status(200).json({
@@ -521,16 +521,17 @@ class LibraryAdminController {
     }
 
     async acceptRenewRequest(req, res) {
-        const { userId } = req.params;
+        const { libraryId } = req.params;
         const { issuedBookId, userRole } = req.body;
+        const { _id: userId } = req.user
         try {
-            if (!issuedBookId || !userId || !userRole)
+            if (!issuedBookId || !libraryId || !userRole)
                 throw customeError(
-                    "Please provide userId, issuedBookId and userRole",
+                    "Please provide libraryId, issuedBookId and userRole",
                     400
                 );
             const isRenewRequest = await renewBookService.findRenewRequestByUserId({
-                userId,
+                libraryId,
                 issuedBookId,
             });
             if (isRenewRequest.error) throw customeError(isRenewRequest.message, 404);
@@ -539,9 +540,10 @@ class LibraryAdminController {
                 _id: issuedBookId,
             });
             if (isIssuedBook.error) throw customeError(isIssuedBook.message, 404);
-            isIssuedBook.data.renewDate = generateRenewDate(15);
+            isIssuedBook.data.renewDate = generateRenewDate(15)
+            isIssuedBook.data.libraryId = libraryId
             await isIssuedBook.data.save();
-            const user = await userService.findUserByProperty(findModel(userRole), {
+            const { data: user } = await userService.findUserByProperty(findModel(userRole), {
                 _id: userId,
             });
             const book = await bookService.findBookByProperty({
@@ -583,10 +585,11 @@ class LibraryAdminController {
                 renewBookDelete: !deleteRenewRequest.error,
             });
         } catch (e) {
+            console.log("libAdminController-acceptRenewRequest: ", e)
             res.status(e.message.status || 500).json({
                 errors: {
                     libraryAdmin: {
-                        msg: e.message.txt,
+                        msg: e.message.txt || e.message,
                     },
                 },
             });

@@ -6,10 +6,12 @@ class LibraryCard {
     async create(req, res) {
         const {
             userName,
+            userRole,
             depertment,
             issueDate,
             libraryId,
             bookLimit,
+
         } = req.body;
 
         try {
@@ -20,12 +22,12 @@ class LibraryCard {
 
             const libraryCardPayload = {
                 userName,
+                userRole,
                 depertment,
                 issueDate,
                 libraryId,
                 bookLimit
             };
-            console.log("payload: ", libraryCardPayload);
             const libraryCard = await libraryCardSearvice.createCard(
                 libraryCardPayload
             );

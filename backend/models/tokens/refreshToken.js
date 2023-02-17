@@ -1,20 +1,17 @@
 const { Schema, model, Types } = require("mongoose");
 
-const refreshToken = Schema(
-  {
+const refreshToken = new Schema({
     token: {
-      type: String,
-      required: true,
+        type: String,
+        required: true,
     },
     userId: {
-      type: Types.ObjectId,
-      required: true,
-      ref: "Student",
+        type: Types.ObjectId,
+        required: true,
+        ref: "Student",
     },
-  },
-  {
+}, {
     timestapms: true,
-  }
-);
+});
 
-module.exports = new model("RefreshTokens", refreshToken);
+module.exports = model("RefreshTokens", refreshToken);

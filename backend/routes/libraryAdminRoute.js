@@ -14,94 +14,94 @@ const libraryStaffControler = require("../controller/libraryStaff/libraryStaffCo
 const libraryStaffService = require("../service/libraryStaffService/libraryStaffService");
 
 router.post(
-  "/create",
-  authenticateMiddleware.authenticate,
-  adminAuthorization.authorized,
-  libraryAdmiinValidator.validate(),
-  libraryAdmiinValidator.validationHnadler,
-  libraryAdminController.createAdmin
+    "/create",
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
+    libraryAdmiinValidator.validate(),
+    libraryAdmiinValidator.validationHnadler,
+    libraryAdminController.createAdmin
 );
 
 router.post("/login", authController.login);
 
 router.get(
-  "/find/requested-books/:userId",
-  authenticateMiddleware.authenticate,
-  adminAuthorization.authorized,
-  libraryAdminController.findUserRequestedBook
+    "/find/requested-books/:libraryId",
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
+    libraryAdminController.findUserRequestedBook
 );
 router.post(
-  "/accept_requested_book",
-  authenticateMiddleware.authenticate,
-  adminAuthorization.authorized,
-  LibraryAdminController.acceptRequestedBook
+    "/accept_requested_book",
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
+    LibraryAdminController.acceptRequestedBook
 );
 
 // Create library staff
 router.post(
-  "/create/staff",
+    "/create/staff",
 
-  authenticateMiddleware.authenticate,
-  adminAuthorization.authorized,
-  libraryStaffValidator.validate(),
-  libraryStaffValidator.validationHandler,
-  libraryStaffControler.register
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
+    libraryStaffValidator.validate(),
+    libraryStaffValidator.validationHandler,
+    libraryStaffControler.register
 );
 router.get(
-  "/find/staff",
-  authenticateMiddleware.authenticate,
-  adminAuthorization.authorized,
-  libraryAdminController.findLibraryStaff
+    "/find/staff",
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
+    libraryAdminController.findLibraryStaff
 );
 router.patch(
-  "/update/staff/:staffId",
-  authenticateMiddleware.authenticate,
-  adminAuthorization.authorized,
-  libraryAdminController.updateLibraryStaff
+    "/update/staff/:staffId",
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
+    libraryAdminController.updateLibraryStaff
 );
 router.delete(
-  "/delete/staff/:staffId",
-  authenticateMiddleware.authenticate,
-  adminAuthorization.authorized,
-  libraryAdminController.deleteLibraryStaff
+    "/delete/staff/:staffId",
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
+    libraryAdminController.deleteLibraryStaff
 );
 router.get(
-  "/find-fine/:userId",
-  authenticateMiddleware.authenticate,
-  adminAuthorization.authorized,
-  libraryAdminController.findUserFine
+    "/find-fine/:userId",
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
+    libraryAdminController.findUserFine
 );
 router.post(
-  "/pay-fine",
-  authenticateMiddleware.authenticate,
-  adminAuthorization.authorized,
-  libraryAdminController.payBookFine
+    "/pay-fine",
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
+    libraryAdminController.payBookFine
 );
 router.get(
-  "/find-return-request/:userId",
-  authenticateMiddleware.authenticate,
-  adminAuthorization.authorized,
-  libraryAdminController.findReturnRequest
+    "/find-return-request/:libraryId",
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
+    libraryAdminController.findReturnRequest
 );
 
 router.post(
-  "/accept-return-request/:userId",
-  authenticateMiddleware.authenticate,
-  adminAuthorization.authorized,
-  libraryAdminController.acceptReturnBookRequest
+    "/accept-return-request/:libraryId",
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
+    libraryAdminController.acceptReturnBookRequest
 );
 
 router.get(
-  "/find-renew-request/:userId",
-  authenticateMiddleware.authenticate,
-  adminAuthorization.authorized,
-  libraryAdminController.findRenewRequest
+    "/find-renew-request/:libraryId",
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
+    libraryAdminController.findRenewRequest
 );
 
 router.post(
-  "/accept-renew-request/:userId",
-  authenticateMiddleware.authenticate,
-  adminAuthorization.authorized,
-  libraryAdminController.acceptRenewRequest,
+    "/accept-renew-request/:libraryId",
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
+    libraryAdminController.acceptRenewRequest,
 );
 module.exports = router;
