@@ -13,6 +13,7 @@ const libraryStaffValidator = require("../middleware/libraryStaff/libraryStaffVa
 const libraryStaffControler = require("../controller/libraryStaff/libraryStaffController");
 const libraryStaffService = require("../service/libraryStaffService/libraryStaffService");
 
+router.post("/login", authController.login);
 router.post(
     "/create",
     authenticateMiddleware.authenticate,
@@ -22,7 +23,12 @@ router.post(
     libraryAdminController.createAdmin
 );
 
-router.post("/login", authController.login);
+router.get(
+    "/find/admins",
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
+    libraryAdminController.findAllAdmin
+);
 
 router.get(
     "/find/requested-books/:libraryId",
@@ -102,6 +108,13 @@ router.post(
     "/accept-renew-request/:libraryId",
     authenticateMiddleware.authenticate,
     adminAuthorization.authorized,
-    libraryAdminController.acceptRenewRequest,
+    libraryAdminController.acceptRenewRequest
+);
+
+router.delete(
+    "/remove-admin/:userId",
+    authenticateMiddleware.authenticate,
+    adminAuthorization.authorized,
+    LibraryAdminController.removeLibraryAdmin
 );
 module.exports = router;
