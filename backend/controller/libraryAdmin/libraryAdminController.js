@@ -31,7 +31,7 @@ class LibraryAdminController {
             const isLibAdmin = await libraryAdminService.findByProperty({
                 email: email,
             });
-            if (isLibAdmin.error) throw customeError(isLibAdmin.message);
+            if (!isLibAdmin.error) throw customeError(isLibAdmin.message);
             // Hash the password
             const hashPassword = await bcrypt.hash(password, 10);
             const payload = {
@@ -51,11 +51,32 @@ class LibraryAdminController {
                 libraryAdmin: libAdmin.data,
             });
         } catch (e) {
-            console.log(e);
+            console.log(e.message);
             res.status(e.message.status).json({
                 errors: {
                     libraryAdmin: {
-                        msg: e.message.txt,
+                        msg: e.message.txt || e.message,
+                    },
+                },
+            });
+        }
+    }
+
+    async findAllAdmin(req, res) {
+        try {
+            const admins = await libraryAdminService.findAll()
+            if (admins.error) throw customeError(admins.message)
+
+            res.status(200).json({
+                message: `Total ${admins.data.length} found`,
+                data: admins.data
+            })
+        } catch (e) {
+            console.log("libAdminController-findAllAdmin: ", e)
+            res.status(e.message.status || 500).json({
+                errors: {
+                    libraryAdmin: {
+                        msg: e.message.txt || e.message,
                     },
                 },
             });
@@ -586,6 +607,35 @@ class LibraryAdminController {
             });
         } catch (e) {
             console.log("libAdminController-acceptRenewRequest: ", e)
+            res.status(e.message.status || 500).json({
+                errors: {
+                    libraryAdmin: {
+                        msg: e.message.txt || e.message,
+                    },
+                },
+            });
+        }
+    }
+
+    async removeLibraryAdmin(req, res) {
+        const { userId } = req.params
+        try {
+            const isLibAdmin = await libraryAdminService.findAll()
+            if (isLibAdmin.error) throw customeError("You can't delete library admin, at least one admin is required in your system.")
+
+            if (isLibAdmin.data.length < 2) throw customeError("You can't delete library admin, at least one admin is required in your system.")
+
+            const libAdmin = await libraryAdminService.delete({ _id: userId })
+
+            if (libAdmin.error) throw customeError(libAdmin.message)
+
+            res.status(200).json({
+                message: "library admin deleted successfully",
+                data: libAdmin.data
+            })
+
+        } catch (e) {
+            console.log("libAdminController-removeLibAdmin: ", e)
             res.status(e.message.status || 500).json({
                 errors: {
                     libraryAdmin: {
