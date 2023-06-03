@@ -17,22 +17,13 @@ const findModel = require("../../../util/findModel");
 class AuthController {
     async register(req, res) {
         const {
-            studentName,
-            teacherName,
-            email,
+            name,
             phone,
             password,
-            avatar,
-            depertment,
-            semester,
-            admission_date,
-            current_year,
             userRole,
-            address,
             libraryId,
-            roles,
+            role,
         } = req.body;
-        const userName = studentName || teacherName
 
         try {
             const libraryCard = await libraryCardSearvice.findCardById(libraryId);
@@ -52,37 +43,15 @@ class AuthController {
                 let payload;
                 if (userRole === "Student" || userRole === "student") {
                     payload = {
-                        studentName,
-                        teacherName,
-                        email,
+                        name,
                         phone,
                         password: hasPassword,
-                        avatar,
-                        depertment,
-                        semester,
-                        admission_date,
-                        current_year,
                         userRole,
-                        address,
                         libraryId,
-                        roles: roles || null,
+                        role: role || null,
                     };
                 }
 
-                if (userRole === "Teacher" || userRole === "teacher") {
-                    payload = {
-                        teacherName,
-                        email,
-                        phone,
-                        password: hasPassword,
-                        avatar,
-                        current_year,
-                        userRole,
-                        address,
-                        libraryId,
-                        roles,
-                    };
-                }
 
                 const newUser = await userService.createNewUser(findModel(userRole), {
                     ...payload,

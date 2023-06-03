@@ -2,13 +2,12 @@ const { Schema, model, Types } = require("mongoose");
 
 const studentSchema = Schema(
   {
-    studentName: {
+    name: {
       type: String,
       required: true,
     },
     email: {
       type: String,
-      required: true,
     },
     phone: {
       type: String,
@@ -24,49 +23,38 @@ const studentSchema = Schema(
     },
     depertment: {
       type: String,
-      required: true,
     },
     semester: {
       type: String,
-      required: true,
     },
     admission_date: {
       type: String,
-      required: true,
     },
     current_year: {
       type: Number,
-      required: true,
     },
     userRole: {
       type: String,
-      required: true,
     },
     address: {
       village: {
         type: String,
-        required: true,
       },
       ps: {
         type: String,
-        required: true,
       },
       po: {
         type: String,
-        required: true,
       },
       district: {
         type: String,
-        required: true,
       },
       state: {
         type: String,
-        required: true,
       },
     },
     libraryId: {
       type: String,
-      required: true,
     },
     issuedBookList: [
       {
