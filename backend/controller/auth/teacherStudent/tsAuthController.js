@@ -151,8 +151,9 @@ class AuthController {
 
             const userDto = new UserDto(user);
             res.status(200).json({
-                user: userDto,
-                auth: true,
+                status:"Ok",
+                message:"Login Successfully",
+                token:accessToken
             });
         } catch (e) {
             console.log(e);
