@@ -1,6 +1,7 @@
 const express = require("express")
 const bodyParser = require("body-parser")
 const cookieParser = require("cookie-parser")
+const cors = require("cors")
 const router = require("./route")
 
 
@@ -12,6 +13,9 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(cookieParser())
 app.use(router)
+app.use(cors({
+    origin:["https://libhub.onrender.com"]
+}))
 
 
 app.use((err, _req, res, _next) => {
