@@ -14,7 +14,7 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(router)
 app.use(cors({
-    origin:["https://libhub.onrender.com"],
+    origin:["http://localhost:3000"],
     credentials:true
 }))
 
