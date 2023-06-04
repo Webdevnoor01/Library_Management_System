@@ -5,18 +5,18 @@ const cors = require("cors")
 const router = require("./route")
 
 
-
-
 const app = express()
+
+app.use(cors({
+    origin:["http://localhost:3000"],
+    credentials:true
+}))
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(cookieParser())
 app.use(router)
-app.use(cors({
-    origin:["http://localhost:3000"],
-    credentials:true
-}))
+
 
 
 app.use((err, _req, res, _next) => {
